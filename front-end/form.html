@@ -1,0 +1,36 @@
+<html>
+  <head>
+  <script
+    src="https://code.jquery.com/jquery-3.6.2.min.js"
+    integrity="sha256-2krYZKh//PcchRtd+H+VyyQoZ/e3EcrkxhM8ycwASPA="
+    crossorigin="anonymous"
+  ></script>
+  <style>
+
+    h1{
+      text-align: center;
+    }
+    .container{
+      margin: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+  <script src="script.js"></script>
+  <body onload="readyForm()">
+    <h1>New Person</h1>
+    <div class="container">
+    <form onsubmit="return false;" action="/person" method="POST">
+      <input name="id" hidden /> <br />
+
+      <label>First Name</label>
+      <input name="first_name" /> <br />
+
+      <label>Last Name</label>
+      <input name="last_name" /> <br />
+
+      <button onclick="save()">Submit</button>
+    </form>
+  </body>
+</div>
+</html>
