@@ -14,13 +14,6 @@
 //     };
 
 //     // CORS
-const headers = {
-  //   "Content-Type": "text/plain",
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
-  "Access-Control-Max-Age": 2592000, // 30 days
-};
 
 // if (req.method === "OPTIONS") {
 //   res.writeHead(204, headers);
@@ -172,14 +165,28 @@ const headers = {
 //   .listen(8081);
 
 // Console will print the message
-
+var cors = require("cors");
 const express = require("express");
 const app = express();
 const fs = require("fs");
+const bodyparser = require("body-parser");
 
-app.listen(3000, function () {
-    console.log("listening on 3000");
-  });
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }));
+
+app.use(cors());
+
+app.use(bodyparser.json());
+
+var result = {
+  status: 0,
+  message: "",
+  list: [],
+};
+
+app.listen(4040, function () {
+  console.log("listening on 4040");
+});
 
 let listDataRaw = fs.readFileSync("database/person-list.json");
 listDataJson = JSON.parse(listDataRaw);
@@ -192,29 +199,51 @@ function writeFile(data) {
   });
 }
 
-app.get("/person/", function (req, res) {
-  //   res.send(JSON.stringify(result));
+
+
+app.get("/person", function (req, res) {
+  result.status = 1;
+  result.message = "Show the list of the person";
+  result.list = listDataJson;
+  res.send(result);
 });
 app.get("/person/:id", function (req, res) {
-    res.send(JSON.stringify(result));
+  // res.send(JSON.stringify(result));
 });
 app.post("/person/", function (req, res) {
-//   let newPerson = {
-//     id: listDataJson.length + 1,
-//     first_name: first_name,
-//     last_name: last_name,
-//   };
-//   listDataJson.push(newPerson);
-//   writeFile(JSON.stringify(listDataJson));
-//   result.status = 1;
-    console.log("submitted");
-//   res.send(JSON.stringify(result));
+  let newPerson = {
+    id: listDataJson.length + 1,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+  };
+  listDataJson.push(newPerson);
+  writeFile(JSON.stringify(listDataJson));
+  result.status = 1;
+  res.send(result);
 });
 app.put("/person/:id", function (req, res) {
-  //   res.send(JSON.stringify(result));
+  let updatedList = listDataJson.map((item) => {
+    if (+item.id == +queryObject.id) {
+      item.first_name = req.body.first_name;
+      item.last_name = req.body.last_name;
+    }
+    return item;
+  });
+  writeFile(JSON.stringify(updatedList));
+  res.send(JSON.stringify(result));
 });
 app.delete("/person/:id", function (req, res) {
-  //   res.send(JSON.stringify(result));
+  result.status = 1;
+  let newList = listDataJson.filter((item) => {
+    return +item.id != +queryObject.id;
+  });
+
+  // reindex ids
+  let i = 1;
+  newList = newList.map((item) => {
+    item.id = i++;
+    return item;
+  });
+
+  res.send(JSON.stringify(result));
 });
-
-

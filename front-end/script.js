@@ -1,11 +1,15 @@
 // Front - end code
 
-const BACKEND_URL = "http://127.0.0.1:3000";
+const BACKEND_URL = "http://127.0.0.1:4040";
 
 function loadList() {
   $.ajax(
     BACKEND_URL + "/person", // request url
     {
+    type: "GET", /* or type:"GET" or type:"PUT" */
+    dataType: "json",
+    data: {
+    },
       success: function (data, status, xhr) {
         console.log(data);
         for (let person of data.list) {
@@ -35,7 +39,7 @@ function save() {
   let action = +id > 0 ? "update" : "insert";
   $.ajax(
     // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-    BACKEND_URL + "/person" + id,
+    BACKEND_URL + "/person",
     {
       type: "POST",
       data: {
@@ -44,9 +48,9 @@ function save() {
       },
       success: function (data, status, xhr) {
         console.log(data);
-        // if (data.status == 1) {
-        //   goto("index.html");
-        // }
+        if (data.status == 1) {
+          goto("index.html");
+        }
       },
     }
   );
@@ -60,7 +64,7 @@ function update() {
   let action = +id > 0 ? "update" : "insert";
   $.ajax(
     // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-    BACKEND_URL + "/person" + id,
+    BACKEND_URL + "/person"+id,
     {
       type: "PUT",
       data: {
@@ -110,7 +114,7 @@ function deletePerson(id, firstName) {
   // view
   if (confirmation) {
     $.ajax(
-      BACKEND_URL + "?action=delete&id=" + id, // request url
+      BACKEND_URL + "/person" + id, // request url
       {
         success: function (data, status, xhr) {
           // console.log("deleted!");
