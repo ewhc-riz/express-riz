@@ -6,10 +6,9 @@ function loadList() {
   $.ajax(
     BACKEND_URL + "/person", // request url
     {
-    type: "GET", /* or type:"GET" or type:"PUT" */
-    dataType: "json",
-    data: {
-    },
+      type: "GET" /* or type:"GET" or type:"PUT" */,
+      dataType: "json",
+      data: {},
       success: function (data, status, xhr) {
         console.log(data);
         for (let person of data.list) {
@@ -36,13 +35,15 @@ function save() {
   let id = $("input[name=id]").val();
   let first_name = $("input[name=first_name]").val();
   let last_name = $("input[name=last_name]").val();
-  let action = +id > 0 ? "update" : "insert";
+  let action = +id > 0 ? "PUT" : "POST";
+  let url = +id > 0 ? id : "";
   $.ajax(
     // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-    BACKEND_URL + "/person",
+    BACKEND_URL + "/person/" + url,
     {
-      type: "POST",
+      type: action,
       data: {
+        id: id,
         first_name: first_name,
         last_name: last_name,
       },
@@ -56,30 +57,30 @@ function save() {
   );
 }
 
-function update() {
-  // alert("clicked save()");
-  let id = $("input[name=id]").val();
-  let first_name = $("input[name=first_name]").val();
-  let last_name = $("input[name=last_name]").val();
-  let action = +id > 0 ? "update" : "insert";
-  $.ajax(
-    // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-    BACKEND_URL + "/person"+id,
-    {
-      type: "PUT",
-      data: {
-        first_name: first_name,
-        last_name: last_name,
-      },
-      success: function (data, status, xhr) {
-        // console.log(data);
-        if (data.status == 1) {
-          goto("index.html");
-        }
-      },
-    }
-  );
-}
+// function update() {
+//   // alert("clicked save()");
+//   let id = $("input[name=id]").val();
+//   let first_name = $("input[name=first_name]").val();
+//   let last_name = $("input[name=last_name]").val();
+//   let action = +id > 0 ? "update" : "insert";
+//   $.ajax(
+//     // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
+//     BACKEND_URL + "/person/" + id,
+//     {
+//       type: "PUT",
+//       data: {
+//         first_name: first_name,
+//         last_name: last_name,
+//       },
+//       success: function (data, status, xhr) {
+//         // console.log(data);
+//         if (data.status == 1) {
+//           goto("index.html");
+//         }
+//       },
+//     }
+//   );
+// }
 
 function readyForm() {
   const urlParams = new URLSearchParams(window.location.search); // <= to get the param `id`
@@ -91,6 +92,7 @@ function readyForm() {
       // BACKEND_URL + "?action=view&id=" + id, // request url
       BACKEND_URL + "/person/" + id,
       {
+        // type: "GET",
         success: function (data, status, xhr) {
           console.log(data);
           let person = data.list[0];
@@ -114,8 +116,12 @@ function deletePerson(id, firstName) {
   // view
   if (confirmation) {
     $.ajax(
-      BACKEND_URL + "/person" + id, // request url
+      BACKEND_URL + "/person/" + id, // request url
       {
+        type: "DELETE",
+        data: {
+          id: id,
+        },
         success: function (data, status, xhr) {
           // console.log("deleted!");
           if (data.status == 1) {

@@ -188,8 +188,6 @@ app.listen(4040, function () {
   console.log("listening on 4040");
 });
 
-let listDataRaw = fs.readFileSync("database/person-list.json");
-listDataJson = JSON.parse(listDataRaw);
 function writeFile(data) {
   fs.writeFile("database/person-list.json", data, function (err) {
     if (err) {
@@ -199,17 +197,27 @@ function writeFile(data) {
   });
 }
 
-
-
+var listDataJson = readFile();
+// View all list
 app.get("/person", function (req, res) {
+  var listDataJson = readFile();
   result.status = 1;
   result.message = "Show the list of the person";
   result.list = listDataJson;
   res.send(result);
 });
+// view
 app.get("/person/:id", function (req, res) {
-  // res.send(JSON.stringify(result));
+  var id = req.params.id;
+  result.status = 1;
+  (result.message = "test"),
+    (result.list = listDataJson.filter((item) => {
+      return +item.id == +id;
+      // em.id == +req.body.id; // Note: + before variable means casting string value into integer
+    }));
+  res.send(result);
 });
+//Insert person
 app.post("/person/", function (req, res) {
   let newPerson = {
     id: listDataJson.length + 1,
@@ -221,21 +229,29 @@ app.post("/person/", function (req, res) {
   result.status = 1;
   res.send(result);
 });
+
+// Update person
 app.put("/person/:id", function (req, res) {
+  var id = req.body.id;
+  result.status = 1;
   let updatedList = listDataJson.map((item) => {
-    if (+item.id == +queryObject.id) {
+    if (+item.id == +id) {
       item.first_name = req.body.first_name;
       item.last_name = req.body.last_name;
     }
     return item;
   });
+  result.list = updatedList;
   writeFile(JSON.stringify(updatedList));
-  res.send(JSON.stringify(result));
+  res.send(result);
 });
+
+// Delete person
 app.delete("/person/:id", function (req, res) {
-  result.status = 1;
+  var id = req.body.id;
+
   let newList = listDataJson.filter((item) => {
-    return +item.id != +queryObject.id;
+    return +item.id != +id;
   });
 
   // reindex ids
@@ -244,6 +260,14 @@ app.delete("/person/:id", function (req, res) {
     item.id = i++;
     return item;
   });
-
-  res.send(JSON.stringify(result));
+  result.status = 1;
+  result.message = "Person deleted";
+  result.list = newList;
+  writeFile(JSON.stringify(newList));
+  res.send(result);
 });
+
+function readFile() {
+  let listDataRaw = fs.readFileSync("database/person-list.json");
+  return JSON.parse(listDataRaw);
+}
