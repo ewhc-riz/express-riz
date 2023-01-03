@@ -141,6 +141,40 @@ function deletePerson(id, firstName) {
   }
 }
 
+// function searchButton() {
+  
+
+//   let searchstr = $("input[name=personId]").val();
+//   let url =  "";
+ 
+//   if(searchstr != ""){
+//     url = searchstr;
+//   }
+//   $.ajax(
+    
+//     BACKEND_URL + "/person/" + url, // request url
+    
+//     {
+//       type: 'GET',
+//       success: function (data, status, xhr) {
+//         console.log(data);
+//         $("#table1 > tbody").html("");
+//         for (let person of data.list) {
+//           // console.log(person);
+          
+//           let rowHtml = `<tr>
+//                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
+//                 <td>${person.first_name}</td>
+//                 <td>${person.last_name}</td>
+//                 <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
+//             </tr>`;
+//           $("#table1 > tbody").append(rowHtml);
+//         }
+//       },
+//     }
+//   );
+// }
+
 function exportExcel() {
   window.open(BACKEND_URL + "?action=download-excel");
 }

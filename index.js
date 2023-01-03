@@ -210,7 +210,7 @@ app.get("/person", function (req, res) {
 app.get("/person/:id", function (req, res) {
   var id = req.params.id;
   result.status = 1;
-  (result.message = "test"),
+  result.message = "Updating Person name and last name of id " + id;
     (result.list = listDataJson.filter((item) => {
       return +item.id == +id;
       // em.id == +req.body.id; // Note: + before variable means casting string value into integer
@@ -267,7 +267,29 @@ app.delete("/person/:id", function (req, res) {
   res.send(result);
 });
 
+//search
+// app.get('/person/:searchstr', (req, res) => {
+//   var searchstr = req.params.searchstr;
+
+//   result.status = 1;
+//   result.message = "Displaying person with " + searchstr ;
+//   result.list = listDataJson.filter((item) => {
+//       return (+item.id == +searchstr || item.first_name.toLowerCase().includes(searchstr) || item.last_name.toLowerCase().includes(searchstr)); // Note: + before variable means casting string value into integer
+//   });
+
+//   res.send(result);
+
+// });
+
 function readFile() {
   let listDataRaw = fs.readFileSync("database/person-list.json");
   return JSON.parse(listDataRaw);
 }
+
+app.get("/person", function (req, res) {
+  var listDataJson = readFile();
+  result.status = 1;
+  result.message = "downloading...";
+  result.list = listDataJson;
+  res.send(result);
+});
