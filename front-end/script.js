@@ -17,6 +17,8 @@ function loadList() {
                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
                 <td>${person.first_name}</td>
                 <td>${person.last_name}</td>
+                <td>${person.birthdate}</td>
+                <td>${person.selectionGender}</td>
                 <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
             </tr>`;
           $("#table1 > tbody").append(rowHtml);
@@ -35,26 +37,42 @@ function save() {
   let id = $("input[name=id]").val();
   let first_name = $("input[name=first_name]").val();
   let last_name = $("input[name=last_name]").val();
-  let action = +id > 0 ? "PUT" : "POST";
-  let url = +id > 0 ? id : "";
-  $.ajax(
-    // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-    BACKEND_URL + "/person/" + url,
-    {
-      type: action,
-      data: {
-        id: id,
-        first_name: first_name,
-        last_name: last_name,
-      },
-      success: function (data, status, xhr) {
-        console.log(data);
-        if (data.status == 1) {
-          goto("index.html");
-        }
-      },
-    }
-  );
+  let birthdate = $("input[name=birthdate]").val();
+  let selectionGender = $("#selectionGender").val();
+  
+
+  $("#status_message").html("");
+
+  if (first_name.trim() == ""){
+    // alert("first name is empty!");
+    $("#status_message").html("First name is empty!");
+  } else if (last_name.trim() == ""){
+    $("#status_message").html("Last name is empty!");
+  }else{
+    let action = +id > 0 ? "PUT" : "POST";
+    let url = +id > 0 ? id : "";
+    $.ajax(
+      // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
+      BACKEND_URL + "/person/" + url,
+      {
+        type: action,
+        data: {
+          id: id,
+          first_name: first_name,
+          last_name: last_name,
+          birthdate : birthdate,
+          selectionGender: selectionGender
+        },
+        success: function (data, status, xhr) {
+          console.log(data);
+          if (data.status == 1) {
+            // console.log(data);
+            goto("index.html");
+          } 
+        },
+      }
+    );
+  } 
 }
 
 // function update() {
@@ -100,6 +118,8 @@ function readyForm() {
             $("input[name=id]").val(person.id);
             $("input[name=first_name]").val(person.first_name);
             $("input[name=last_name]").val(person.last_name);
+            $("input[name=birthdate]").val(person.birthdate);
+            $("#selectionGender").val(person.selectionGender);
           }
         },
       }

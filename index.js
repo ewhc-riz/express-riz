@@ -170,6 +170,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const bodyparser = require("body-parser");
+const { format } = require("url");
 
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -198,6 +199,18 @@ function writeFile(data) {
 }
 
 var listDataJson = readFile();
+
+function validate(form) {
+  if (form.first_name == "") {
+    return "First name is required!";
+  } else if (form.last_name == "") {
+    return "Last name is required!";
+  } else if (form.last_name.trim().length < 2) {
+    return "Last name is too short!";
+  } else {
+    return "";
+  }
+}
 // View all list
 app.get("/person", function (req, res) {
   var listDataJson = readFile();
@@ -206,43 +219,63 @@ app.get("/person", function (req, res) {
   result.list = listDataJson;
   res.send(result);
 });
+
 // view
 app.get("/person/:id", function (req, res) {
   var id = req.params.id;
   result.status = 1;
   result.message = "Updating Person name and last name of id " + id;
-    (result.list = listDataJson.filter((item) => {
-      return +item.id == +id;
-      // em.id == +req.body.id; // Note: + before variable means casting string value into integer
-    }));
+  result.list = listDataJson.filter((item) => {
+    return +item.id == +id;
+    // em.id == +req.body.id; // Note: + before variable means casting string value into integer
+  });
   res.send(result);
 });
+
 //Insert person
 app.post("/person/", function (req, res) {
-  let newPerson = {
-    id: listDataJson.length + 1,
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-  };
-  listDataJson.push(newPerson);
-  writeFile(JSON.stringify(listDataJson));
-  result.status = 1;
+  let errorMessage = validate(req.body);
+
+  if (errorMessage != "") {
+    result.status = 0;
+    result.message = errorMessage;
+  } else {
+    let newPerson = {
+      id: listDataJson.length + 1,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      birthdate: req.body.birthdate,
+      selectionGender: req.body.selectionGender,
+    };
+    listDataJson.push(newPerson);
+    writeFile(JSON.stringify(listDataJson));
+  }
+
   res.send(result);
 });
 
 // Update person
 app.put("/person/:id", function (req, res) {
-  var id = req.body.id;
-  result.status = 1;
-  let updatedList = listDataJson.map((item) => {
-    if (+item.id == +id) {
-      item.first_name = req.body.first_name;
-      item.last_name = req.body.last_name;
-    }
-    return item;
-  });
-  result.list = updatedList;
-  writeFile(JSON.stringify(updatedList));
+  let errorMessage = validate(req.body);
+  if (errorMessage != "") {
+    result.status = 0;
+    result.message = errorMessage;
+  } else {
+    var id = req.body.id;
+    result.status = 1;
+    let updatedList = listDataJson.map((item) => {
+      if (+item.id == +id) {
+        item.first_name = req.body.first_name;
+        item.last_name = req.body.last_name;
+        item.birthdate = req.body.birthdate;
+        item.selectionGender = req.body.selectionGender;
+      }
+      return item;
+    });
+    result.list = updatedList;
+    writeFile(JSON.stringify(updatedList));
+  }
+
   res.send(result);
 });
 
