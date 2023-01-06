@@ -16,7 +16,7 @@ function loadList() {
         for (let person of data.list) {
           // console.log(person);
           var citizen = "";
-          if (person.citizen == "true" ) {
+          if (person.citizen == "true") {
             citizen = "checked";
           } 
           let rowHtml =
@@ -26,7 +26,7 @@ function loadList() {
                 <td>${person.last_name}</td>
                 <td>${person.birthdate}</td>
                 <td>${person.selectionGender}</td>
-                <td><input type = "checkbox" ` + citizen + ` disabled/></td>
+                <td><input type = "checkbox" ` + citizen + ` disabled></td>
                 <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
             </tr>`;
           $("#table1 > tbody").append(rowHtml);
@@ -49,15 +49,19 @@ function save() {
   let selectionGender = $("#selectionGender").val();
   let citizen = $("#citizen").prop("checked");
 
-  $("#status_message").html("");
+  $("#status_message1").html("");
+  $("#status_message2").html("");
+  $("#status_message3").html("");
 
   if (first_name.trim() == "") {
     // alert("first name is empty!");
-    $("#status_message").html("First name is empty!");
+    $("#status_message1").html("First name is empty!");
   } else if (last_name.trim() == "") {
-    $("#status_message").html("Last name is empty!");
+    $("#status_message2").html("Last name is empty!");
   } else if (last_name.trim().length < 2) {
     $("#status_message").html("Last name is too short!");
+  } else if (birthdate.trim() == "") {
+    $("#status_message3").html("Please choose your birthday!");
   } else {
     let action = +id > 0 ? "PUT" : "POST";
     let url = +id > 0 ? id : "";
@@ -131,7 +135,7 @@ function readyForm() {
             $("input[name=last_name]").val(person.last_name);
             $("input[name=birthdate]").val(person.birthdate);
             $("#selectionGender").val(person.selectionGender);
-            $("#citizen").prop("checked", person.citizen);
+            $("#citizen").prop("checked", person.citizen ? true : false);
           }
         },
       }

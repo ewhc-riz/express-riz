@@ -50,7 +50,7 @@ div.content {
   margin-top: 5px;
 }
 
-#status_message{
+#status_message1 , #status_message2, #status_message3{
   color: red;
 }
 
@@ -68,14 +68,17 @@ div.content {
               <input name="id" hidden /> <br />
               <label for="firstNameSample">First Name</label>
               <input name="first_name" class="form-control" id="firstNameSample">
+              <div id="status_message1"></div>
             </div>
             <div class="form-group">
               <label for="sampleLastSample">Last Name</label>
               <input name="last_name" class="form-control" id="sampleLastSample">
+              <div id="status_message2"></div>
             </div>
             <div class="form-group">
               <label for="datepicker">Birthdate</label>
               <input name="birthdate" type="date" class="form-control" id="datepicker">
+              <div id="status_message3"></div>
             </div>
             <div class="form-group">
               <label for="selectionGender">Gender</label>
@@ -92,18 +95,19 @@ div.content {
           </div>
             <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
               </form>
-              <div id="status_message"></div>
         </div>
       </div>
       <script>
         $(function() {
-    $('<div id="status_message"></div>')
-    .insertBefore('#status_message')
+    $('<div id="status_message1"></div>')
+    .insertBefore('#status_message1')
     .delay(4000)
     .fadeOut(function() {
       $(this).remove(); 
     });
 });
+
+
         </script>
   </body>
 </div>
