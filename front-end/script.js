@@ -1,5 +1,7 @@
 // Front - end code
 
+// const e = require("cors");
+
 const BACKEND_URL = "http://127.0.0.1:4040";
 
 function loadList() {
@@ -13,12 +15,18 @@ function loadList() {
         console.log(data);
         for (let person of data.list) {
           // console.log(person);
-          let rowHtml = `<tr>
+          var citizen = "";
+          if (person.citizen == "true" ) {
+            citizen = "checked";
+          } 
+          let rowHtml =
+            `<tr>
                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
                 <td>${person.first_name}</td>
                 <td>${person.last_name}</td>
                 <td>${person.birthdate}</td>
                 <td>${person.selectionGender}</td>
+                <td><input type = "checkbox" ` + citizen + ` disabled/></td>
                 <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
             </tr>`;
           $("#table1 > tbody").append(rowHtml);
@@ -39,16 +47,18 @@ function save() {
   let last_name = $("input[name=last_name]").val();
   let birthdate = $("input[name=birthdate]").val();
   let selectionGender = $("#selectionGender").val();
-  
+  let citizen = $("#citizen").prop("checked");
 
   $("#status_message").html("");
 
-  if (first_name.trim() == ""){
+  if (first_name.trim() == "") {
     // alert("first name is empty!");
     $("#status_message").html("First name is empty!");
-  } else if (last_name.trim() == ""){
+  } else if (last_name.trim() == "") {
     $("#status_message").html("Last name is empty!");
-  }else{
+  } else if (last_name.trim().length < 2) {
+    $("#status_message").html("Last name is too short!");
+  } else {
     let action = +id > 0 ? "PUT" : "POST";
     let url = +id > 0 ? id : "";
     $.ajax(
@@ -60,19 +70,20 @@ function save() {
           id: id,
           first_name: first_name,
           last_name: last_name,
-          birthdate : birthdate,
-          selectionGender: selectionGender
+          birthdate: birthdate,
+          selectionGender: selectionGender,
+          citizen: citizen,
         },
         success: function (data, status, xhr) {
           console.log(data);
           if (data.status == 1) {
-            // console.log(data);
+            // console.log(data.citizen);
             goto("index.html");
-          } 
+          }
         },
       }
     );
-  } 
+  }
 }
 
 // function update() {
@@ -120,6 +131,7 @@ function readyForm() {
             $("input[name=last_name]").val(person.last_name);
             $("input[name=birthdate]").val(person.birthdate);
             $("#selectionGender").val(person.selectionGender);
+            $("#citizen").prop("checked", person.citizen);
           }
         },
       }
@@ -162,18 +174,17 @@ function deletePerson(id, firstName) {
 }
 
 // function searchButton() {
-  
 
 //   let searchstr = $("input[name=personId]").val();
 //   let url =  "";
- 
+
 //   if(searchstr != ""){
 //     url = searchstr;
 //   }
 //   $.ajax(
-    
+
 //     BACKEND_URL + "/person/" + url, // request url
-    
+
 //     {
 //       type: 'GET',
 //       success: function (data, status, xhr) {
@@ -181,7 +192,7 @@ function deletePerson(id, firstName) {
 //         $("#table1 > tbody").html("");
 //         for (let person of data.list) {
 //           // console.log(person);
-          
+
 //           let rowHtml = `<tr>
 //                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
 //                 <td>${person.first_name}</td>

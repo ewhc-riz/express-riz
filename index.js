@@ -224,7 +224,7 @@ app.get("/person", function (req, res) {
 app.get("/person/:id", function (req, res) {
   var id = req.params.id;
   result.status = 1;
-  result.message = "Updating Person name and last name of id " + id;
+  result.message = "Updating Person details " + id;
   result.list = listDataJson.filter((item) => {
     return +item.id == +id;
     // em.id == +req.body.id; // Note: + before variable means casting string value into integer
@@ -246,6 +246,7 @@ app.post("/person/", function (req, res) {
       last_name: req.body.last_name,
       birthdate: req.body.birthdate,
       selectionGender: req.body.selectionGender,
+      citizen: req.body.citizen
     };
     listDataJson.push(newPerson);
     writeFile(JSON.stringify(listDataJson));
@@ -269,6 +270,7 @@ app.put("/person/:id", function (req, res) {
         item.last_name = req.body.last_name;
         item.birthdate = req.body.birthdate;
         item.selectionGender = req.body.selectionGender;
+        item.citizen = req.body.citizen;
       }
       return item;
     });

@@ -86,11 +86,25 @@ div.content {
               <option value="Undecided">Undecided</option>
             </select>
           </div>
-            <button type="submit" class="btn btn-primary" onclick="save()">Submit</button>
+          <div class="form-group">
+            <input name="citizen" type="checkbox" class="form-check-input" id="citizen">
+            <label for="citizen">Are you a Filipino?</label>
+          </div>
+            <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
               </form>
               <div id="status_message"></div>
         </div>
       </div>
+      <script>
+        $(function() {
+    $('<div id="status_message"></div>')
+    .insertBefore('#status_message')
+    .delay(4000)
+    .fadeOut(function() {
+      $(this).remove(); 
+    });
+});
+        </script>
   </body>
 </div>
 </html>
