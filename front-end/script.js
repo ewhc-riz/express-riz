@@ -1,6 +1,26 @@
 // Front - end code
 
 // const e = require("cors");
+$.fn.serializeObject = function() {
+  var o = {};
+  var a = this.serializeArray();
+  $.each(a, function() {
+      if (o[this.name]) {
+          if (!o[this.name].push) {
+              o[this.name] = [o[this.name]];
+          }
+          o[this.name].push(this.value || '');
+      } else {
+          o[this.name] = this.value || '';
+      }
+  });
+  return o;
+};
+
+$(document).ready ( function(){
+  console.log("ready");
+
+});
 
 const BACKEND_URL = "http://127.0.0.1:4040";
 
@@ -41,29 +61,11 @@ function goto(url) {
 }
 
 function save() {
-  // alert("clicked save()");
-  let id = $("input[name=id]").val();
-  let first_name = $("input[name=first_name]").val();
-  let last_name = $("input[name=last_name]").val();
-  let birthdate = $("input[name=birthdate]").val();
-  let selectionGender = $("#selectionGender").val();
-  let citizen = $("#citizen").prop("checked");
-
+  let registrationFormValue = $("#registrationForm").serializeObject();
+  
   $("#status_message1").html("");
-  $("#status_message2").html("");
-  $("#status_message3").html("");
-
-  if (first_name.trim() == "") {
-    // alert("first name is empty!");
-    $("#status_message1").html("First name is empty!");
-  } else if (last_name.trim() == "") {
-    $("#status_message2").html("Last name is empty!");
-  } else if (last_name.trim().length < 2) {
-    $("#status_message").html("Last name is too short!");
-  } else if (birthdate.trim() == "") {
-    $("#status_message3").html("Please choose your birthday!");
-  } else {
-    let action = +id > 0 ? "PUT" : "POST";
+  
+    let +id > 0 ? "PUT" : "POST";
     let url = +id > 0 ? id : "";
     $.ajax(
       // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
@@ -71,23 +73,23 @@ function save() {
       {
         type: action,
         data: {
-          id: id,
-          first_name: first_name,
-          last_name: last_name,
-          birthdate: birthdate,
-          selectionGender: selectionGender,
-          citizen: citizen,
+          registrationFormValue
         },
         success: function (data, status, xhr) {
           console.log(data);
           if (data.status == 1) {
             // console.log(data.citizen);
             goto("index.html");
+          } else {
+            $("#status_message1").html(data.message)
+            setTimeout(function(){
+              $("#status_message1").fadeOut();;
+            },2000)
           }
         },
       }
     );
-  }
+  // }
 }
 
 // function update() {
@@ -213,3 +215,4 @@ function deletePerson(id, firstName) {
 function exportExcel() {
   window.open(BACKEND_URL + "?action=download-excel");
 }
+

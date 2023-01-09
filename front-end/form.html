@@ -63,22 +63,19 @@ div.content {
         <div class="content">
           <h3>New Person</h3>
           <hr />
-          <form onsubmit="return false;" action="/person" method="POST">
+          <form onsubmit="return false;" action="/person" method="POST" id="registrationForm">
             <div class="form-group">
               <input name="id" hidden /> <br />
               <label for="firstNameSample">First Name</label>
               <input name="first_name" class="form-control" id="firstNameSample">
-              <div id="status_message1"></div>
             </div>
             <div class="form-group">
               <label for="sampleLastSample">Last Name</label>
               <input name="last_name" class="form-control" id="sampleLastSample">
-              <div id="status_message2"></div>
             </div>
             <div class="form-group">
               <label for="datepicker">Birthdate</label>
               <input name="birthdate" type="date" class="form-control" id="datepicker">
-              <div id="status_message3"></div>
             </div>
             <div class="form-group">
               <label for="selectionGender">Gender</label>
@@ -89,26 +86,16 @@ div.content {
               <option value="Undecided">Undecided</option>
             </select>
           </div>
+          
           <div class="form-group">
             <input name="citizen" type="checkbox" class="form-check-input" id="citizen">
             <label for="citizen">Are you a Filipino?</label>
           </div>
             <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
+            <div id="status_message1"></div>
               </form>
         </div>
       </div>
-      <script>
-        $(function() {
-    $('<div id="status_message1"></div>')
-    .insertBefore('#status_message1')
-    .delay(4000)
-    .fadeOut(function() {
-      $(this).remove(); 
-    });
-});
-
-
-        </script>
   </body>
 </div>
 </html>
