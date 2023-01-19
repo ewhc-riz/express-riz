@@ -242,7 +242,7 @@ app.post("/person/", function (req, res) {
       id: listDataJson.length + 1,
       first_name: req.body.first_name,
       last_name: req.body.last_name,
-      birthdate: req.body.birthdate,
+      date_of_birth: req.body.date_of_birth,
       selectionGender: req.body.selectionGender,
       citizen: req.body.citizen
     };
@@ -266,7 +266,7 @@ app.put("/person/:id", function (req, res) {
       if (+item.id == +id) {
         item.first_name = req.body.first_name;
         item.last_name = req.body.last_name;
-        item.birthdate = req.body.birthdate;
+        item.date_of_birth = req.body.date_of_birth;
         item.selectionGender = req.body.selectionGender;
         item.citizen = req.body.citizen;
       }
