@@ -1,36 +1,32 @@
-// Front - end code
 
-// const e = require("cors");
-$.fn.serializeObject = function() {
+$.fn.serializeObject = function () {
   var o = {};
   var a = this.serializeArray();
-  $.each(a, function() {
-      if (o[this.name]) {
-          if (!o[this.name].push) {
-              o[this.name] = [o[this.name]];
-          }
-          o[this.name].push(this.value || '');
-      } else {
-          o[this.name] = this.value || '';
+  $.each(a, function () {
+    if (o[this.name]) {
+      if (!o[this.name].push) {
+        o[this.name] = [o[this.name]];
       }
+      o[this.name].push(this.value || "");
+    } else {
+      o[this.name] = this.value || "";
+    }
   });
   return o;
 };
 
-$(document).ready ( function(){
+$(document).ready(function () {
   console.log("ready");
-
 });
 
 const BACKEND_URL = "http://127.0.0.1:4040";
 
 function loadList() {
   $.ajax(
-    BACKEND_URL + "/person", // request url
+    BACKEND_URL + "/base-person", // request url
     {
       type: "GET" /* or type:"GET" or type:"PUT" */,
-      dataType: "json",
-      data: {},
+      data: {first_name: '', last_name: '', birthdate: '', selectionGender: '', citizen: ''},
       success: function (data, status, xhr) {
         console.log(data);
         for (let person of data.list) {
@@ -38,7 +34,7 @@ function loadList() {
           var citizen = "";
           if (person.citizen == "true") {
             citizen = "checked";
-          } 
+          }
           let rowHtml =
             `<tr>
                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
@@ -46,12 +42,14 @@ function loadList() {
                 <td>${person.last_name}</td>
                 <td>${person.birthdate}</td>
                 <td>${person.selectionGender}</td>
-                <td><input type = "checkbox" ` + citizen + ` disabled></td>
+                <td><input type = "checkbox" ` +
+            citizen +
+            ` disabled></td>
                 <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
             </tr>`;
           $("#table1 > tbody").append(rowHtml);
         }
-      },
+      }, 
     }
   );
 }
@@ -62,33 +60,31 @@ function goto(url) {
 
 function save() {
   let registrationFormValue = $("#registrationForm").serializeObject();
-  
+  let id = registrationFormValue.id;
   $("#status_message1").html("");
-  
-    let +id > 0 ? "PUT" : "POST";
-    let url = +id > 0 ? id : "";
-    $.ajax(
-      // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
-      BACKEND_URL + "/person/" + url,
-      {
-        type: action,
-        data: {
-          registrationFormValue
-        },
-        success: function (data, status, xhr) {
-          console.log(data);
-          if (data.status == 1) {
-            // console.log(data.citizen);
-            goto("index.html");
-          } else {
-            $("#status_message1").html(data.message)
-            setTimeout(function(){
-              $("#status_message1").fadeOut();;
-            },2000)
-          }
-        },
-      }
-    );
+  let url = +id > 0 ? id : "";
+  $.ajax(
+    // BACKEND_URL + "?action=" + action + "&id=" + id, // request url
+    BACKEND_URL + "/base-person/" + url,
+    {
+      type: +id > 0 ? "PUT" : "POST",
+      data: {
+        registrationFormValue,
+      },
+      success: function (data, status, xhr) {
+        console.log(data);
+        if (data.status == 1) {
+          console.log();
+          // goto("index.html");
+        } else {
+          $("#status_message1").html(data.message);
+          setTimeout(function () {
+            $("#status_message1").fadeOut();
+          }, 2000);
+        }
+      },
+    }
+  );
   // }
 }
 
@@ -132,11 +128,18 @@ function readyForm() {
           console.log(data);
           let person = data.list[0];
           if (person) {
-            $("input[name=id]").val(person.id);
-            $("input[name=first_name]").val(person.first_name);
-            $("input[name=last_name]").val(person.last_name);
-            $("input[name=birthdate]").val(person.birthdate);
-            $("#selectionGender").val(person.selectionGender);
+            // $("input[name=id]").val(person.id);
+            // $("input[name=first_name]").val(person.first_name);
+            // $("input[name=last_name]").val(person.last_name);
+            // $("input[name=birthdate]").val(person.birthdate);
+            // $("#selectionGender").val(person.selectionGender);
+            
+
+            let registrationFormValue = $("#registrationForm").serializeObject();
+            for(let key of Object.keys(registrationFormValue)){
+              $("input[name="+key+"]").val(person[key]);
+              console.log("??key", key);
+            }
             $("#citizen").prop("checked", person.citizen ? true : false);
           }
         },
@@ -215,4 +218,3 @@ function deletePerson(id, firstName) {
 function exportExcel() {
   window.open(BACKEND_URL + "?action=download-excel");
 }
-

@@ -205,8 +205,6 @@ function validate(form) {
     return "First name is required!";
   } else if (form.last_name == "") {
     return "Last name is required!";
-  } else if (form.last_name.trim().length < 2) {
-    return "Last name is too short!";
   } else {
     return "";
   }
