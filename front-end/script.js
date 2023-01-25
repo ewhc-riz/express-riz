@@ -18,11 +18,11 @@ $(document).ready(function () {
   console.log("ready");
 });
 
-const BACKEND_URL = "http://127.0.0.1:4040";
+const BACKEND_URL = "http://127.0.0.1:3000/api/main";
 
 function loadList() {
   $.ajax(
-    BACKEND_URL + "/base-person", // request url
+    BACKEND_URL + "/base-persons", // request url
     {
       type: "GET" /* or type:"GET" or type:"PUT" */,
       data: {
@@ -66,7 +66,7 @@ function save() {
   let id = registrationFormValue.id;
   $("#status_message1").html("");
   let url = +id > 0 ? id : "";
-  $.ajax(BACKEND_URL + "/base-person/" + url, {
+  $.ajax(BACKEND_URL + "/base-persons/" + url, {
     type: +id > 0 ? "PUT" : "POST",
     data: registrationFormValue,
     success: function (data, status, xhr) {
@@ -91,7 +91,7 @@ function readyForm() {
 
   // view
   if (+id > 0) {
-    $.ajax(BACKEND_URL + "/base-person/" + id, {
+    $.ajax(BACKEND_URL + "/base-persons/" + id, {
       // type: "GET",
       success: function (data, status, xhr) {
         console.log(data);
@@ -117,7 +117,7 @@ function deletePerson(id, firstName) {
   // view
   if (confirmation) {
     $.ajax(
-      BACKEND_URL + "/base-person/" + id, // request url
+      BACKEND_URL + "/base-persons/" + id, // request url
       {
         type: "DELETE",
         data: {
