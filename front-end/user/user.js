@@ -20,7 +20,7 @@ $.fn.serializeObject = function () {
   
   const BACKEND_URL = "http://127.0.0.1:3000/api/main";
   
-  function loadList() {
+  function loadUser() {
     $.ajax(
       BACKEND_URL + "/base-users", // request url
       {
@@ -41,7 +41,6 @@ $.fn.serializeObject = function () {
             let rowHtml = `<tr>
                   <td><a href="form.html?id=${user.id}">${user.id}</a></td>
                   <td>${user.username}</td>
-                  <td>${user.password}</td>
                   <td><button class="btn btn-danger" onclick="deletePerson(${user.id}, '${user.username}')">Delete</button></td>
               </tr>`;
             $("#table1 > tbody").append(rowHtml);
