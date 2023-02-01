@@ -25,7 +25,7 @@
 
 .div-center {
   width: 400px;
-  height: 400px;
+  height: 250px;
   background-color: #fff;
   position: absolute;
   left: 0;
@@ -43,7 +43,7 @@
 
 div.content {
   display: table-cell;
-  vertical-align: middle;
+  vertical-align: left;
 }
 
 .btn {
@@ -56,41 +56,39 @@ div.content {
 
   </style>
 </head>
-  <script src="script.js"></script>   
+  <script src="edu.js"></script>   
     <body onload="readyForm()"></body>
     <div class="back">
       <div class="div-center">
         <div class="content">
-          <h3>New Person</h3>
+          <h3>New Employee Education</h3>
           <hr />
-          <form onsubmit="return false;" action="/person" method="POST" id="registrationForm">
+          <form onsubmit="return false;" action="/education" method="POST" id="registrationForm">
             <div class="form-group">
               <input name="id" hidden /> <br />
-              <label for="firstNameSample">First Name</label>
-              <input name="first_name" class="form-control" id="firstNameSample">
             </div>
             <div class="form-group">
-              <label for="sampleLastSample">Last Name</label>
-              <input name="last_name" class="form-control" id="sampleLastSample">
-            </div>
-            <div class="form-group">
-              <label for="datepicker">Birthdate</label>
-              <input name="date_of_birth" type="date" class="form-control" id="datepicker">
-            </div>
-            <div class="form-group">
-              <label for="selectionGender">Gender</label>
-            <select name="gender" class="form-select" aria-label="Default select example" id ="selectionGender">
-              <option value="">Please select..</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-            </select>
+              <label for="person_id">Employee Number</label>
+              <select class="form-select" id="empedu-dropdown" name="employee_id">
+                <option value="">Please Select</option>
+                <option value="1">Abby</option>
+                <option value="2">Marlon</option>
+              </select>
           </div>
-          
           <div class="form-group">
-            <input name="citizen" type="checkbox" class="form-check-input" id="citizen">
-            <label for="citizen">Are you a Filipino?</label>
+            <label for="person_id">Education Level</label>
+           <select class="form-select" id="person-id-dropdown" id="level">
+                <option value="">Please Select</option>
+                <option value="ELEMENTARY">Elementary</option>
+                <option value="HIGH SCHOOL">High School</option>
+                <option value="COLLEGE">College</option>
+                <option value="VOCATIONAL">Vocational</option>
+                <option value="MASTERS DEGREE">Masters Degree</option>
+                <option value="PHD">PHD</option>
+              </select>
           </div>
             <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
+            <button type="submit" class="btn btn-secondary" onclick="goto('user.html')">Back</button>  
             <div id="status_message1"></div>
               </form>
         </div>

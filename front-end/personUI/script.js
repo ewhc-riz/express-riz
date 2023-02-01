@@ -40,15 +40,14 @@ function loadList() {
           if (person.citizen == "true") {
             citizen = "checked";
           }
-          let rowHtml =
-            `<tr>
+          let rowHtml = `<tr>
                 <td><a href="form.html?id=${person.id}">${person.id}</a></td>
                 <td>${person.first_name}</td>
                 <td>${person.last_name}</td>
                 <td>${person.date_of_birth}</td>
                 <td>${person.gender}</td>
                 <td>Yes/No</td>
-                <td><button onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
+                <td><button class="btn btn-danger" onclick="deletePerson(${person.id}, '${person.first_name}')">Delete</button></td>
             </tr>`;
           $("#table1 > tbody").append(rowHtml);
         }
@@ -73,7 +72,7 @@ function save() {
       console.log(data);
       if (data.status == 1) {
         console.log();
-        // goto("index.html");
+        goto("../personUI/index.html");
       } else {
         $("#status_message1").html(data.message);
         setTimeout(function () {
