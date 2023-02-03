@@ -12,6 +12,7 @@ function validate(data) {
   } else if (data.gender.trim() == "") {
     errorMessage = "Gender is required";
   }
+  
   return errorMessage;
 }
 

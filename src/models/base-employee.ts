@@ -81,7 +81,7 @@ export let queryBaseEmp: any = {
   },
   get(id) {
     let _self = this;
-    return new Promise((resolve, reject) => {   
+    return new Promise((resolve, reject) => {
       db.query(
         `SELECT base_employee.* FROM base_employee WHERE base_employee.id=?`,
         [id],
@@ -157,12 +157,7 @@ export let queryBaseEmp: any = {
           WHERE
             id=?
           `,
-        [
-          data.person_id,
-          data.employee_no,
-          data.date_created,
-          data.id,
-        ],
+        [data.person_id, data.employee_no, data.date_created, data.id],
         (err, results) => {
           if (err) {
             console.log("Reject error:", err);
@@ -175,17 +170,43 @@ export let queryBaseEmp: any = {
   },
   delete(id) {
     return new Promise((resolve, reject) => {
-      db.query(
-        `DELETE FROM base_employee WHERE id=?`,
-        [id],
-        (err, results) => {
-          if (err) {
-            console.log("Reject error:", err);
-            return reject(err);
-          }
-          return resolve(results);
+      db.query(`DELETE FROM base_employee WHERE id=?`, [id], (err, results) => {
+        if (err) {
+          console.log("Reject error:", err);
+          return reject(err);
         }
-      );
+        return resolve(results);
+      });
     });
   },
+
+  getNewEmployeeNo() {
+    return new Promise((resolve, reject) => {
+      db.query(`SELECT MAX(substring(employee_no, 5, 5)) + 1 as employee_no FROM base_employee `, (err, results) => {
+        if (err) {
+          console.log("Reject error:", err);
+          return reject(err);
+        }
+
+        return resolve(results);
+      });
+    });
+  },
+  checkPersonIfEmployee(personId){
+   
+      db.query(`SELECT * FROM base_employee WHERE person_id = ?`, [personId], (err, results) => {
+        if (err) {
+          console.log("Reject error:", err);
+          return err;
+        }
+        else {
+          console.log(results);
+          return results;
+        }
+      });
+    
+
+  },
+
+
 };

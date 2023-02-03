@@ -50,23 +50,34 @@ function goto(url) {
 }
 
 function loadPerson() {
+  var person_id = $("#person_id").val();
+  $.ajax(BACKEND_URL + "/base-persons", {
+    type: "GET",
+    success: function (data) {
+      console.log(data);
+      $("#person_id").empty();
+      $("#person_id").append('<option value="">Select option</option>');
 
-  var person_id = $("#person_id_dropdown").val();
-    $.ajax(BACKEND_URL + "/base-employees", {
-      type: "GET",
-      success: function (data) {
-        console.log(data);
-        $("#person_id_dropdown").empty();
-        $("#person_id_dropdown").append(
-          '<option value="">Select option</option>'
+      Object.values(data.list).forEach((value) => {
+        $("#person_id").append(
+          $(
+            "<option value='" +
+              value.id +
+              "'>" +
+              (value.last_name + ", " + value.first_name) +
+              "</option>"
+          )
         );
-        $.each(data, function (key, value) {
-          $("#person_id_dropdown").append(
-            $("<option>", { value: key["id"], text: value["person_id"] })
-          );
-        });
-      },
-    });
+      });
+    },
+  });
+  $.ajax(BACKEND_URL + "/base-employees/get-employee-no", {
+    type: "GET",
+    success: function (data) {
+      console.log(data);
+      $("#employee_no").val(data.employee_no);
+    },
+  });
 }
 
 function readyForm() {
