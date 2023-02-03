@@ -49,29 +49,29 @@ function goto(url) {
   window.location = url;
 }
 
-function loadPersonForm(){
-    $("#person-id-dropdown").on("change", function () {
-    var person_id = $('#person-id-dropdown').val();
-    $.ajax(BACKEND_URL + "/base-employees/get-person", {
+function loadPerson() {
+
+  var person_id = $("#person_id_dropdown").val();
+    $.ajax(BACKEND_URL + "/base-employees", {
       type: "GET",
       success: function (data) {
         console.log(data);
-        $('#person-id-dropdown').empty();
-          $("#person-id-dropdown").append('<option value="">Select option</option>')
-        $.each(data, function(key,value){
-          $('#person-id-dropdown').append($('<option>', {value: value['id'], text: value['person_id']}))
-        })
+        $("#person_id_dropdown").empty();
+        $("#person_id_dropdown").append(
+          '<option value="">Select option</option>'
+        );
+        $.each(data, function (key, value) {
+          $("#person_id_dropdown").append(
+            $("<option>", { value: key["id"], text: value["person_id"] })
+          );
+        });
       },
     });
-  });
-
-
 }
 
 function readyForm() {
   const urlParams = new URLSearchParams(window.location.search); // <= to get the param `id`
   let id = urlParams.get("id");
-
 
   // view
   if (+id > 0) {
@@ -141,4 +141,3 @@ function deletePerson(id, employee_no) {
     );
   }
 }
-

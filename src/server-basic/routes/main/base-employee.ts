@@ -13,16 +13,18 @@ function validate(data) {
 }
 
 router.get("/", async (req, res) => {
+  console.log("base_person");
   res.send(await queryBaseEmp.getAll(req.query));
 });
+
+// router.get("/get-person", async (req, res) => {
+//   console.log("base_person");
+//   res.send(await queryBaseEmp.getPerson(req.query));
+// });
 
 router.get("/:id", async (req, res) => {
   let employee = await queryBaseEmp.get(+req.params.id);
   res.send(employee);
-});
-
-router.get("/getperson", async (req, res) => {
-  res.send(await queryBaseEmp.getPerson(req.query));
 });
 
 router.post("/", async (req, res) => {

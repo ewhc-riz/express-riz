@@ -13,9 +13,7 @@ export let queryBaseEmp: any = {
     let _self = this;
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee `;
-      let query = `SELECT 
-                base_employee.* 
-            FROM base_employee`;
+      let query = `SELECT * FROM base_person INNER JOIN base_employee ON base_person.id = base_employee.person_id`;
       let whereClause = ` WHERE 1 `;
       //   if (data.first_name.trim().length > 0) {
       //     let qAll = db.escape(
@@ -107,7 +105,7 @@ export let queryBaseEmp: any = {
     let _self = this;
     return new Promise((resolve, reject) => {
       db.query(
-        `SELECT id, person_id FROM base_employee ORDER by person_id DESC`,
+        `SELECT * FROM base_person INNER JOIN base_employee ON base_person.id = base_employee.person_id`,
         (err, results) => {
           if (err) {
             console.log("Reject error:", err);
