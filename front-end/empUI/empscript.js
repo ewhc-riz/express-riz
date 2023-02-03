@@ -36,7 +36,10 @@ function loadEmployee() {
                   <td><a href="emp-form.html?id=${emp.id}">${emp.id}</a></td>
                   <td>${emp.person_id}</td>
                   <td>${emp.employee_no}</td>
-                  <td><button class="btn btn-danger" onclick="deletePerson(${emp.id}, '${emp.employee_no}')">Delete</button></td>
+                  <td>${emp.last_name}</td>
+                  <td>${emp.first_name}</td>
+                  
+                  <td><button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">Delete</button></td>
               </tr>`;
           $("#table1 > tbody").append(rowHtml);
         }
@@ -128,15 +131,15 @@ function save() {
   // }
 }
 
-function deletePerson(id, employee_no) {
+function deleteEmployee(id) {
   var confirmation = confirm(
-    "Are you sure you want to delete " + employee_no + "?"
+    "Are you sure you want to delete ?"
   );
 
   // view
   if (confirmation) {
     $.ajax(
-      BACKEND_URL + "/base-persons/" + id, // request url
+      BACKEND_URL + "/base-employees/delete-employee/" + id, // request url
       {
         type: "DELETE",
         data: {
@@ -144,8 +147,9 @@ function deletePerson(id, employee_no) {
         },
         success: function (data, status, xhr) {
           if (data.status == 1) {
-            $("#table1 > tbody").html("");
-            loadList();
+            
+            location.reload();
+
           }
         },
       }

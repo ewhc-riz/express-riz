@@ -12,8 +12,11 @@ export let queryBaseEmpEd: any = {
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee_education `;
       let query = `SELECT 
-              base_employee_education.*
-          FROM base_employee_education `;
+                        base_employee_education.*, base_employee.*, base_person.*, base_employee_education.id as base_employee_education_id
+                        FROM base_employee_education 
+                        INNER JOIN base_employee ON (base_employee.id = base_employee_education.employee_id)
+                        INNER JOIN base_person ON (base_person.id = base_employee.person_id)
+                        `;
       let whereClause = ` WHERE 1 `;
       //   if (data.first_name.trim().length > 0) {
       //     let qAll = db.escape(
@@ -79,8 +82,9 @@ export let queryBaseEmpEd: any = {
       });
     });
   },
-  get(id) {
+  getEducation(id) {
     let _self = this;
+   
     return new Promise((resolve, reject) => {
       db.query(
         `SELECT base_employee_education.* FROM base_employee_education WHERE base_employee_education.id=?`,
@@ -90,13 +94,8 @@ export let queryBaseEmpEd: any = {
             console.log("Reject error:", err);
             return reject(err);
           }
-          results.map(function (row, index) {
-            // row["statusProperty"] = _self.getStatusProperty(row);
-            row["date_of_birth"] = moment(row.date_of_birth).format(
-              "YYYY-MM-DD"
-            );
-          });
-          return resolve(results[0]);
+          //console.log(results);
+           return resolve(results[0]);
         }
       );
     });
@@ -109,12 +108,14 @@ export let queryBaseEmpEd: any = {
           (
             employee_id, 
             level,
+            school_name,
+            year_graduated,
             date_created
           ) VALUES (
-            ?,?,
+            ?,?,?,?,
             NOW()
           )`,
-        [data.employee_id, data.level],
+        [data.employee_id, data.level, data.school_name, data.year_graduated],
         (err, results) => {
           if (err) {
             console.log("Reject error:", err);
@@ -130,16 +131,14 @@ export let queryBaseEmpEd: any = {
       db.query(
         `UPDATE base_employee_education 
           SET
-            employe_id=?, 
-            level=?,
-          WHERE
+            level = ?,
+            school_name = ?,
+            year_graduated = ?
+            
+            WHERE
             id=?
           `,
-        [
-          data.employee_id,
-          data.level,
-          data.id,
-        ],
+        [data.level, data.school_name, data.year_graduated, data.id],
         (err, results) => {
           if (err) {
             console.log("Reject error:", err);
@@ -152,13 +151,37 @@ export let queryBaseEmpEd: any = {
   },
   delete(id) {
     return new Promise((resolve, reject) => {
-      db.query(`DELETE FROM base_employee_education WHERE id=?`, [id], (err, results) => {
-        if (err) {
-          console.log("Reject error:", err);
-          return reject(err);
+      db.query(
+        `DELETE FROM base_employee_education WHERE id=?`,
+        [id],
+        (err, results) => {
+          if (err) {
+            console.log("Reject error:", err);
+            return reject(err);
+          }
+          return resolve(results);
         }
-        return resolve(results);
-      });
+      );
+    });
+  },
+
+  checkEducationIfExists(employee_id: number, level: string) {
+    return new Promise((resolve, reject) => {
+      db.query(
+        `SELECT * FROM base_employee_education WHERE employee_id = ? AND level = ?`,
+        [employee_id, level],
+        (err, results) => {
+          if (err) {
+            console.log("Reject error:", err);
+            return reject(err);
+          }
+          if (results.length > 0) {
+            return resolve(true);
+          } else {
+            return resolve(false);
+          }
+        }
+      );
     });
   },
 };

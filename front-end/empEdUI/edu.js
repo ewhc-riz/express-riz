@@ -33,10 +33,14 @@ function loadEmployeeEd() {
         for (let edu of data.list) {
           // console.log(emp);
           let rowHtml = `<tr>
-                    <td><a href="emp-form.html?id=${edu.id}">${edu.id}</a></td>
+                    <td><a href="edu-form.html?id=${edu.base_employee_education_id}">${edu.base_employee_education_id}</a></td>
                     <td>${edu.employee_id}</td>
+                    <td>${edu.last_name}, ${edu.first_name}</td>
                     <td>${edu.level}</td>
-                    <td><button class="btn btn-danger" onclick="deletePerson(${edu.id}, '${edu.employee_no}')">Delete</button></td>
+                    <td>${edu.school_name}</td>
+                    <td>${edu.year_graduated}</td>
+                    
+                    <td><button class="btn btn-danger" onclick="deleteEmployeeEducation(${edu.base_employee_education_id})">Delete</button></td>
                 </tr>`;
           $("#table1 > tbody").append(rowHtml);
         }
@@ -50,18 +54,18 @@ function goto(url) {
 }
 
 function loadPersonForm() {
-  $.ajax(BACKEND_URL + "/base-persons", {
+  $.ajax(BACKEND_URL + "/base-employees", {
     type: "GET",
     success: function (data) {
       console.log(data);
-      $("#person_id").empty();
-      $("#person_id").append('<option value="">Select option</option>');
+      $("#employee_id").empty();
+      $("#employee_id").append('<option value="">Select option</option>');
 
       Object.values(data.list).forEach((value) => {
-        $("#person_id").append(
+        $("#employee_id").append(
           $(
             "<option value='" +
-              value.id +
+              value.employee_id +
               "'>" +
               (value.last_name + ", " + value.first_name) +
               "</option>"
@@ -70,16 +74,13 @@ function loadPersonForm() {
       });
     },
   });
-}
 
-function readyForm() {
   const urlParams = new URLSearchParams(window.location.search); // <= to get the param `id`
   let id = urlParams.get("id");
-
   // view
   if (+id > 0) {
-    $.ajax(BACKEND_URL + "/base-employees/" + id, {
-      // type: "GET",
+    $.ajax(BACKEND_URL + "/base-employees-education/get-education/" + id, {
+      type: "GET",
       success: function (data, status, xhr) {
         console.log(data);
         let person = data;
@@ -87,7 +88,7 @@ function readyForm() {
           let registrationFormValue = $("#registrationForm").serializeObject();
           for (let key of Object.keys(registrationFormValue)) {
             $("[name=" + key + "]").val(person[key]);
-            // console.log("??key", key);
+             console.log("??key", key);
           }
           // $("#citizen").prop("checked", person.citizen ? true : false);
         }
@@ -95,6 +96,8 @@ function readyForm() {
     });
   }
 }
+
+
 
 function save() {
   let registrationFormValue = $("#registrationForm").serializeObject();
@@ -110,25 +113,26 @@ function save() {
         console.log();
         goto("../empEdUI/edu.html");
       } else {
+
         $("#status_message1").html(data.message);
-        setTimeout(function () {
-          $("#status_message1").fadeOut();
-        }, 2000);
+
+        // setTimeout(function () {
+        //   $("#status_message1").fadeOut();
+        // }, 5000);
       }
     },
   });
   // }
 }
 
-function deletePerson(id, employee_no) {
+function deleteEmployeeEducation(id) {
   var confirmation = confirm(
-    "Are you sure you want to delete " + employee_no + "?"
+    "Are you sure you want to delete ?"
   );
-
   // view
   if (confirmation) {
     $.ajax(
-      BACKEND_URL + "/base-persons/" + id, // request url
+      BACKEND_URL + "/base-employees-education/delete/" + id, // request url
       {
         type: "DELETE",
         data: {
@@ -136,8 +140,7 @@ function deletePerson(id, employee_no) {
         },
         success: function (data, status, xhr) {
           if (data.status == 1) {
-            $("#table1 > tbody").html("");
-            loadList();
+            location.reload();
           }
         },
       }

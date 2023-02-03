@@ -63,27 +63,39 @@ div.content {
         <div class="content">
           <h3>New Employee Education</h3>
           <hr />
-          <form onsubmit="return false;" action="/education" method="POST" id="registrationForm">
+          <form onsubmit="return false;" method="POST" id="registrationForm">
             <div class="form-group">
               <input name="id" hidden /> <br />
             </div>
             <div class="form-group">
-              <label for="person_id">Employee Number</label>
-              <select class="form-select" id="person_id" name="person_id">
-                  </select>
-          </div>
+              <label for="employee_id">Select Employee</label>
+              <select class="form-select" id="employee_id" name="employee_id">
+                  <option value="">Select</option>
+              </select>
+            </div>
           <div class="form-group">
-            <label for="person_id">Education Level</label>
-           <select class="form-select" id="person-id-dropdown" id="level">
+            <label for="level">Education Level</label>
+           <select class="form-select" name="level" id="level">
                 <option value="">Please Select</option>
-                <option value="ELEMENTARY">Elementary</option>
-                <option value="HIGH SCHOOL">High School</option>
-                <option value="COLLEGE">College</option>
-                <option value="VOCATIONAL">Vocational</option>
-                <option value="MASTERS DEGREE">Masters Degree</option>
+                <option value="ELEMENTARY">ELEMENTARY</option>
+                <option value="HIGH SCHOOL">HIGH SCHOOL</option>
+                <option value="COLLEGE">COLLEGE</option>
+                <option value="VOCATIONAL">VOCATIONAL</option>
+                <option value="MASTERS DEGREE">MASTERS DEGREE</option>
                 <option value="PHD">PHD</option>
               </select>
           </div>
+          <div class="form-group">
+            <label for="school_name">School</label>
+            <input class="form-control" type="text" id="school_name" name="school_name" />
+      </div>
+      <div class="form-group">
+        <label for="school_name">Year Graduated</label>
+        <input class="form-control" type="number" id="year_graduated" name="year_graduated" min="1900" max="2003" />
+     </div>
+
+
+
             <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
             <button type="submit" class="btn btn-secondary" onclick="goto('edu.html')">Back</button>  
             <div id="status_message1"></div>
