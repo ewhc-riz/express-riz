@@ -110,31 +110,50 @@ function readyForm() {
 function save() {
   let registrationFormValue = $("#registrationForm").serializeObject();
   let id = registrationFormValue.id;
-  $("#status_message1").html("");
-  let url = +id > 0 ? id : "";
-  $.ajax(BACKEND_URL + "/base-employees/" + url, {
-    type: +id > 0 ? "PUT" : "POST",
-    data: registrationFormValue,
-    success: function (data, status, xhr) {
-      console.log(data);
-      if (data.status == 1) {
-        console.log();
-        goto("../empUI/emp.html");
-      } else {
-        $("#status_message1").html(data.message);
-        setTimeout(function () {
-          $("#status_message1").fadeOut();
-        }, 2000);
-      }
-    },
+
+  // construct payload json
+  let employeeEducations = [];
+  $("#employee_education").each(function (index) {
+    var level = $("#level_" + index).val();
+    var school_name = $("#school_name_" + index).val();
+    var year_graduated = $("#year_graduated_" + index).val();
+
+    employeeEducations.push({
+      level: level,
+      school_name: school_name,
+      year_graduated: year_graduated,
+    });
   });
+
+  registrationFormValue["employee_educations"] = employeeEducations;
+
+  console.log("??payload: ", registrationFormValue);
+
+  // $("#status_message1").html("");
+  // let url = +id > 0 ? id : "";
+  // $.ajax(BACKEND_URL + "/base-employees/" + url, {
+  //   type: +id > 0 ? "PUT" : "POST",
+  //   data: registrationFormValue,
+  //   success: function (data, status, xhr) {
+  //     console.log(data);
+  //     if (data.status == 1) {
+  //       console.log();
+  //       goto("../empUI/emp.html");
+  //     } else {
+  //       $("#status_message1").html(data.message);
+  //       setTimeout(function () {
+  //         $("#status_message1").fadeOut();
+  //       }, 2000);
+  //     }
+  //   },
+  // });
+
+
   // }
 }
 
 function deleteEmployee(id) {
-  var confirmation = confirm(
-    "Are you sure you want to delete ?"
-  );
+  var confirmation = confirm("Are you sure you want to delete ?");
 
   // view
   if (confirmation) {
@@ -147,12 +166,34 @@ function deleteEmployee(id) {
         },
         success: function (data, status, xhr) {
           if (data.status == 1) {
-            
             location.reload();
-
           }
         },
       }
     );
   }
+}
+
+function addEducation() {
+  index = $("#employee_education tbody tr").length;
+  // console.log("??index: ", index);
+
+  html = `
+    <tr>
+      <td>
+        <select class="form-select" id="level_${index}">
+          <option value="">Please Select</option>
+          <option value="ELEMENTARY">ELEMENTARY</option>
+          <option value="HIGH SCHOOL">HIGH SCHOOL</option>
+          <option value="COLLEGE">COLLEGE</option>
+          <option value="VOCATIONAL">VOCATIONAL</option>
+          <option value="MASTERS DEGREE">MASTERS DEGREE</option>
+          <option value="PHD">PHD</option>
+        </select>
+      </td>
+      <td><input class="form-control" type="text" id="school_name_${index}"/></td>
+      <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2003" /></td>
+    <tr>
+  `;
+  $("#employee_education tbody").append(html);
 }

@@ -24,7 +24,7 @@
 }
 
 .div-center {
-  width: 400px;
+  width: 600px;
   height: 250px;
   background-color: #fff;
   position: absolute;
@@ -54,6 +54,10 @@ div.content {
   color: red;
 }
 
+#employee_education{
+  width: 100%;
+}
+
   </style>
 </head>
   <script src="empscript.js"></script>   
@@ -76,6 +80,23 @@ div.content {
             <label for="employee_no">Employee #</label>
             <input name="employee_no" class="form-control" id="employee_no">
           </div>
+          <div>
+            <button type="button" class="btn btn-warning" onclick="addEducation()">Add Education</button>
+            <table id="employee_education">
+              <thead>
+                <tr>
+                  <th>Education Level</th>
+                  <th>School</th>
+                  <th>Year Graduated</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+            <br />
+            <br />
+
             <button type="submit" class="btn btn-warning" onclick="save()">Submit</button>
             <button type="submit" class="btn btn-secondary" onclick="goto('emp.html')">Back</button>  
             <div id="status_message1"></div>
