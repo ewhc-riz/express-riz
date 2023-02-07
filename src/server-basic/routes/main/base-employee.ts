@@ -5,11 +5,26 @@ import { queryBaseEmp } from "../../../models/base-employee";
 function validate(data) {
   let errorMessage = "";
 
-  if (data.person_id == "") {
-    errorMessage = "Person is required";
-  } else if (data.employee_no == "") {
-    errorMessage = "Employee number is required";
-  }
+  if (data.last_name == "") {
+    // errorMessage = "Person is required";
+    errorMessage += "Lastname is required <br>";
+  
+   } 
+   if (data.first_name == "") {
+    // errorMessage = "Person is required";
+    errorMessage += "Firstname is required <br>";
+  
+   } 
+   if (data.gender == "") {
+    // errorMessage = "Person is required";
+    errorMessage += "Gender is required <br>";
+   } 
+   if (data.date_of_birth == "") {
+    // errorMessage = "Person is required";
+    errorMessage += "Birthday is required <br>";
+     } 
+ 
+  
   return errorMessage;
 }
 
@@ -18,10 +33,6 @@ router.get("/", async (req, res) => {
   res.send(await queryBaseEmp.getAll(req.query));
 });
 
-// router.get("/get-person", async (req, res) => {
-//   console.log("base_person");
-//   res.send(await queryBaseEmp.getPerson(req.query));
-// });
 
 router.get("/employeeinfo/:id", async (req, res) => {
   let employee = await queryBaseEmp.get(+req.params.id);
@@ -31,12 +42,11 @@ router.get("/employeeinfo/:id", async (req, res) => {
 router.get("/get-employee-no", async (req, res) => {
   let employee = await queryBaseEmp.getNewEmployeeNo();
 
-  //console.log(employee.length);
   let employee_no = "";
   if (employee[0].employee_no == null) {
     employee_no = "EMP-00001";
   } else {
-    console.log(employee);
+ //   console.log(employee);
     employee_no = "EMP-" + employee[0].employee_no.toString().padStart(5, "0");
   }
 

@@ -125,27 +125,142 @@ export let queryBaseEmp: any = {
   insert(data) {
     // console.log("??data: ", data);
     return new Promise((resolve, reject) => {
-      db.query(
-        `INSERT INTO base_employee 
-              (
-                person_id,
-                employee_no,
-                date_created
-              ) VALUES (
-                ?,?,
-                NOW()
-              )`,
-        [data.person_id, data.employee_no],
-        (err, results) => {
-          if (err) {
-            console.log("Reject error:", err);
-            return reject(err);
+
+      let person_id = data.person_id;
+      let insertEmployeeId: number;
+      if (person_id == "") {
+        db.query(
+          `INSERT INTO base_person 
+                      (
+                        first_name,
+                        last_name,
+                        date_of_birth,
+                        gender,
+                        citizen,
+                        date_created
+                      ) 
+                      VALUES
+                      (
+                          ?,
+                          ?,
+                          ?,
+                          ?,
+                          ?,
+                          NOW()
+                      )`, [data.first_name,
+        data.last_name,
+        moment(data.date_of_birth).format('YYYY-MM-DD'),
+        data.gender,
+        data.citizen == "on" ? 1 : 0
+        ],
+          (err, result) => {
+            if (err) {
+              console.log('Insert Person Error: ', err);
+              reject(err);
+            }
+            person_id = result.insertId;
+            console.log('Insert Employee ID: ', person_id);
+            //      return resolve(person_id);
+            db.query(
+              `INSERT INTO base_employee 
+                      (
+                        person_id,
+                        employee_no,
+                        date_created
+                      ) VALUES (
+                        ?,?,
+                        NOW()
+                      )`,
+              [person_id, data.employee_no],
+              (err, result) => {
+                if (err) {
+                  console.log("Insert Employee Error: ", err);
+                  return reject(err);
+                }
+                insertEmployeeId = result.insertId;
+                for (let educ of data.employee_educations) {
+                  db.query(
+                    `INSERT INTO base_employee_education 
+                            (
+                              employee_id,
+                              level,
+                              school_name,
+                              year_graduated
+                            ) VALUES (
+                              ?,?,?, ?
+                            )`,
+                    [insertEmployeeId, educ.level, educ.school_name, educ.year_graduated],
+                    (err, result) => {
+                      if (err) {
+                        console.log("Insert Employee Education Error: ", err);
+                        return reject(err);
+                      }
+                      console.log('Inserted Employee Education of Employee ID :', insertEmployeeId);
+                      return resolve(result)  ;  }
+                  );
+                }
+                resolve(insertEmployeeId);
+              }
+            );
+      
+  
+
+          })
+
+
+      }
+      if (+person_id > 0)
+      {
+        db.query(
+          `INSERT INTO base_employee 
+                  (
+                    person_id,
+                    employee_no,
+                    date_created
+                  ) VALUES (
+                    ?,?,
+                    NOW()
+                  )`,
+          [person_id, data.employee_no],
+          (err, result) => {
+            if (err) {
+              console.log("Insert Employee Error: ", err);
+              return reject(err);
+            }
+            insertEmployeeId = result.insertId;
+            for (let educ of data.employee_educations) {
+              db.query(
+                `INSERT INTO base_employee_education 
+                        (
+                          employee_id,
+                          level,
+                          school_name,
+                          year_graduated
+                        ) VALUES (
+                          ?,?,?, ?
+                        )`,
+                [insertEmployeeId, educ.level, educ.school_name, educ.year_graduated],
+                (err, result) => {
+                  if (err) {
+                    console.log("Insert Employee Education Error: ", err);
+                    return reject(err);
+                  }
+                  console.log('Inserted Employee Education of Employee ID :', insertEmployeeId);
+                  return resolve(result)  ;  }
+              );
+            }
+            resolve(insertEmployeeId);
           }
-          return resolve(results);
-        }
-      );
+        );
+  
+      }
+    
+     
+
     });
   },
+
+
   update(data) {
     return new Promise((resolve, reject) => {
       db.query(
@@ -192,9 +307,9 @@ export let queryBaseEmp: any = {
       });
     });
   },
-  checkPersonIfEmployee(personId){
+  checkPersonIfEmployee(personId) {
     return new Promise((resolve, reject) => {
-      db.query(`SELECT * FROM base_employee WHERE person_id = ?`,  [personId], (err, results) => {
+      db.query(`SELECT * FROM base_employee WHERE person_id = ?`, [personId], (err, results) => {
         if (err) {
           console.log("Reject error:", err);
           return reject(err);

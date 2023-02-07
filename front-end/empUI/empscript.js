@@ -14,11 +14,52 @@ $.fn.serializeObject = function () {
   return o;
 };
 
-$(document).ready(function () {
-  console.log("ready");
-});
 
 const BACKEND_URL = "http://127.0.0.1:3000/api/main";
+
+$(document).ready(function () {
+
+  console.log("ready");
+  $('#person_id').on('change', function(){
+    let id = $('#person_id').val();
+    // view
+    if (+id > 0) {
+      $.ajax(BACKEND_URL + "/base-persons/" + id, {
+        // type: "GET",
+        success: function (data, status, xhr) {
+          console.log(data);
+          let person = data;
+          if (person) {
+            let registrationFormValue = $("#registrationForm").serializeObject();
+            for (let key of Object.keys(registrationFormValue)) {
+              if (key != 'employee_no' && key != 'person_id') {
+                $("[name=" + key + "]").val(person[key]);
+      
+              }
+                         }
+            }
+        },
+      });
+    }
+    else {
+      let registrationFormValue = $("#registrationForm").serializeObject();
+      for (let key of Object.keys(registrationFormValue)) {
+        if (key != 'employee_no' && key != 'person_id') {
+          $("[name=" + key + "]").val('');
+
+        }
+       
+      }
+
+    }
+  
+  })
+
+  
+
+
+});
+
 
 function loadEmployee() {
   $.ajax(
@@ -113,7 +154,8 @@ function save() {
 
   // construct payload json
   let employeeEducations = [];
-  $("#employee_education").each(function (index) {
+  $("#employee_education > tbody > tr").each(function (index) {
+    console.log(index);
     var level = $("#level_" + index).val();
     var school_name = $("#school_name_" + index).val();
     var year_graduated = $("#year_graduated_" + index).val();
@@ -129,28 +171,28 @@ function save() {
 
   console.log("??payload: ", registrationFormValue);
 
-  // $("#status_message1").html("");
-  // let url = +id > 0 ? id : "";
-  // $.ajax(BACKEND_URL + "/base-employees/" + url, {
-  //   type: +id > 0 ? "PUT" : "POST",
-  //   data: registrationFormValue,
-  //   success: function (data, status, xhr) {
-  //     console.log(data);
-  //     if (data.status == 1) {
-  //       console.log();
-  //       goto("../empUI/emp.html");
-  //     } else {
-  //       $("#status_message1").html(data.message);
-  //       setTimeout(function () {
-  //         $("#status_message1").fadeOut();
-  //       }, 2000);
-  //     }
-  //   },
-  // });
+  $("#status_message1").html("");
+  let url = +id > 0 ? id : "";
+  $.ajax(BACKEND_URL + "/base-employees/" + url, {
+    type: +id > 0 ? "PUT" : "POST",
+    data: registrationFormValue,
+    success: function (data, status, xhr) {
+      console.log(data);
+      if (data.status == 1) {
+        console.log();
+        goto("../empUI/emp.html");
+      } else {
+        $("#status_message1").html(data.message);
+        setTimeout(function () {
+          $("#status_message1").fadeOut();
+        }, 2000);
+      }
+    },
+  });
 
 
-  // }
-}
+  }
+
 
 function deleteEmployee(id) {
   var confirmation = confirm("Are you sure you want to delete ?");
@@ -174,9 +216,10 @@ function deleteEmployee(id) {
   }
 }
 
+var index = 0;
 function addEducation() {
-  index = $("#employee_education tbody tr").length;
-  // console.log("??index: ", index);
+  //var index = $("#employee_education tbody tr").length -1;
+  
 
   html = `
     <tr>
@@ -193,7 +236,9 @@ function addEducation() {
       </td>
       <td><input class="form-control" type="text" id="school_name_${index}"/></td>
       <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2003" /></td>
-    <tr>
+    </tr>
   `;
   $("#employee_education tbody").append(html);
+  //console.log("??index: ", index);
+index ++;
 }
