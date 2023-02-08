@@ -13,10 +13,13 @@ export let queryBasePerson: any = {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_person `;
       let query = `SELECT 
               base_person.*,
-              COALESCE(base_person.gender, "") AS 'gender' 
-          FROM base_person `;
+              COALESCE(base_person.gender, "") AS 'gender', base_employee.id as employee_id 
+          FROM base_person LEFT JOIN base_employee on (base_person.id = base_employee.person_id) `;
       let whereClause = ` WHERE 1 `;
-      //   if (data.first_name.trim().length > 0) {
+      if (data.query_employee_id == 1){
+        whereClause += ` AND base_employee.employee_id IS NULL`;
+      }
+      //   if (data.first_name.t rim().length > 0) {
       //     let qAll = db.escape(
       //       "%" + data.first_name.toLowerCase().trim() + "%"
       //     );

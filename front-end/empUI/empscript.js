@@ -18,46 +18,7 @@ $.fn.serializeObject = function () {
 const BACKEND_URL = "http://127.0.0.1:3000/api/main";
 
 $(document).ready(function () {
-
   console.log("ready");
-  $('#person_id').on('change', function(){
-    let id = $('#person_id').val();
-    // view
-    if (+id > 0) {
-      $.ajax(BACKEND_URL + "/base-persons/" + id, {
-        // type: "GET",
-        success: function (data, status, xhr) {
-          console.log(data);
-          let person = data;
-          if (person) {
-            let registrationFormValue = $("#registrationForm").serializeObject();
-            for (let key of Object.keys(registrationFormValue)) {
-              if (key != 'employee_no' && key != 'person_id') {
-                $("[name=" + key + "]").val(person[key]);
-      
-              }
-                         }
-            }
-        },
-      });
-    }
-    else {
-      let registrationFormValue = $("#registrationForm").serializeObject();
-      for (let key of Object.keys(registrationFormValue)) {
-        if (key != 'employee_no' && key != 'person_id') {
-          $("[name=" + key + "]").val('');
-
-        }
-       
-      }
-
-    }
-  
-  })
-
-  
-
-
 });
 
 
@@ -79,6 +40,9 @@ function loadEmployee() {
                   <td>${emp.employee_no}</td>
                   <td>${emp.last_name}</td>
                   <td>${emp.first_name}</td>
+                  <td>${emp.educ_years}</td>
+                  <td>${emp.educ_levels}</td>
+                  
                   
                   <td><button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">Delete</button></td>
               </tr>`;
@@ -106,10 +70,10 @@ function loadPerson() {
         $("#person_id").append(
           $(
             "<option value='" +
-              value.id +
-              "'>" +
-              (value.last_name + ", " + value.first_name) +
-              "</option>"
+            value.id +
+            "'>" +
+            (value.last_name + ", " + value.first_name) +
+            "</option>"
           )
         );
       });
@@ -134,17 +98,81 @@ function readyForm() {
       // type: "GET",
       success: function (data, status, xhr) {
         console.log(data);
-        let person = data;
-        if (person) {
+        let employee = data.employee.list[0];
+        if (employee) {
           let registrationFormValue = $("#registrationForm").serializeObject();
           for (let key of Object.keys(registrationFormValue)) {
-            $("[name=" + key + "]").val(person[key]);
-            // console.log("??key", key);
+            $("[name=" + key + "]").val(employee[key]);
           }
-          // $("#citizen").prop("checked", person.citizen ? true : false);
+          let education = data.education.list;
+          for (index = 0; index < education.length; index ++) {
+            html = `
+            <tr id="educ_row_${education[index].id}">
+             <td>
+               <select class="form-select" id="level_${index}" value>
+                 <option value="">Please Select</option>
+                 <option value="ELEMENTARY">ELEMENTARY</option>
+                 <option value="HIGH SCHOOL">HIGH SCHOOL</option>
+                 <option value="COLLEGE">COLLEGE</option>
+                 <option value="VOCATIONAL">VOCATIONAL</option>
+                 <option value="MASTERS DEGREE">MASTERS DEGREE</option>
+                 <option value="PHD">PHD</option>
+               </select>
+             </td>
+             <td><input class="form-control" type="text" id="school_name_${index}"/></td>
+             <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2023" /></td>
+             <td><input class="form-control" type="hidden" id="employee_education_id_${index}"/></td>
+             <td><input class="form-control" type="hidden" id="educ_for_deletion_${index}"/></td>
+             <td><button class="btn btn-primary" onclick="deleteEducRow('existing', ${education[index].id}, ${index})">Delete</button></td>
+             
+            </tr>
+           `;
+            $("#employee_education tbody").append(html);
+            $(`#level_${index}`).val(education[index].level);
+            $(`#school_name_${index}`).val(education[index].school_name);
+            $(`#year_graduated_${index}`).val(education[index].year_graduated);
+            $(`#employee_education_id_${index}`).val(education[index].id);
+            $(`#educ_for_deletion_${index}`).val(0);
+            
+            console.log(education[index]);
+            console.log(index);
+           }
         }
       },
     });
+  }
+  else{
+    $.ajax(BACKEND_URL + "/base-employees/get-employee-no", {
+      type: "POST",
+      success: function (data) {
+        console.log(data);
+        $("#employee_no").val(data.employee_no);
+      },
+    });
+  }
+}
+function deleteEducRow(status, rowId, index)
+{
+  if(confirm('Confirm Delete of Educ Row?') ) {
+    if (status == 'existing') {
+      $(`#educ_row_${rowId}`).css({
+        'text-decoration': 'line-through'
+      });
+
+      $(`#educ_for_deletion_${index}`).val('1');
+
+    }
+
+    else {
+      $(`#educ_new_row_${index}`).css({
+        'text-decoration': 'line-through'
+      });
+      $(`#educ_for_deletion_${index}`).val(1);
+
+    }
+
+    //$(`#${rowId}`).remove();
+
   }
 }
 
@@ -159,11 +187,14 @@ function save() {
     var level = $("#level_" + index).val();
     var school_name = $("#school_name_" + index).val();
     var year_graduated = $("#year_graduated_" + index).val();
-
+    var educ_id = $("#employee_education_id_" + index).val();
+    var for_deletion = $(`#educ_for_deletion_` + index).val();
     employeeEducations.push({
+      id : educ_id,
       level: level,
       school_name: school_name,
       year_graduated: year_graduated,
+      for_deletion : for_deletion
     });
   });
 
@@ -191,7 +222,7 @@ function save() {
   });
 
 
-  }
+}
 
 
 function deleteEmployee(id) {
@@ -216,13 +247,12 @@ function deleteEmployee(id) {
   }
 }
 
-var index = 0;
 function addEducation() {
-  //var index = $("#employee_education tbody tr").length -1;
-  
+  var index = $("#employee_education tbody tr").length;
+  console.log("??index: ", index);
 
   html = `
-    <tr>
+    <tr id="educ_new_row_${index}">
       <td>
         <select class="form-select" id="level_${index}">
           <option value="">Please Select</option>
@@ -235,10 +265,13 @@ function addEducation() {
         </select>
       </td>
       <td><input class="form-control" type="text" id="school_name_${index}"/></td>
-      <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2003" /></td>
-    </tr>
+      <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2023" /></td>
+      <td><input class="form-control" type="hidden" id="employee_education_id_${index}" value="0" /></td>
+      <td><input class="form-control" type="hidden" id="educ_for_deletion_${index}" value="0"/></td>
+      <td><button class="btn btn-primary" onclick="deleteEducRow('new',0, ${index})">Delete</button></td>
+      
+      </tr>
   `;
   $("#employee_education tbody").append(html);
-  //console.log("??index: ", index);
-index ++;
+  
 }

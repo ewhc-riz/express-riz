@@ -31,6 +31,7 @@ function loadList() {
         date_of_birth: "",
         selectionGender: "",
         citizen: "",
+        query_employee_id: 0
       },
       success: function (data, status, xhr) {
         console.log(data);

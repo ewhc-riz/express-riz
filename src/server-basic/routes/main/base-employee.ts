@@ -8,45 +8,56 @@ function validate(data) {
   if (data.last_name == "") {
     // errorMessage = "Person is required";
     errorMessage += "Lastname is required <br>";
-  
-   } 
-   if (data.first_name == "") {
+
+  }
+  if (data.first_name == "") {
     // errorMessage = "Person is required";
     errorMessage += "Firstname is required <br>";
-  
-   } 
-   if (data.gender == "") {
+
+  }
+  if (data.gender == "") {
     // errorMessage = "Person is required";
     errorMessage += "Gender is required <br>";
-   } 
-   if (data.date_of_birth == "") {
+  }
+  if (data.date_of_birth == "") {
     // errorMessage = "Person is required";
     errorMessage += "Birthday is required <br>";
-     } 
- 
-  
+  }
+
+
   return errorMessage;
 }
 
 router.get("/", async (req, res) => {
-  console.log("base_employee");
+  //  console.log("base_employee");
   res.send(await queryBaseEmp.getAll(req.query));
 });
 
 
-router.get("/employeeinfo/:id", async (req, res) => {
-  let employee = await queryBaseEmp.get(+req.params.id);
-  res.send(employee);
+router.get("/:id", async (req, res) => {
+  let data = {
+    employeeId: req.params.id
+  };
+  let employeeInfo = await queryBaseEmp.getAll(data);
+  
+  let employeeEducation = await queryBaseEmp.getEmployeeEducation(req.params.id);
+  
+  
+
+  res.send( {
+    employee : employeeInfo,
+    education : employeeEducation
+  });
 });
 
-router.get("/get-employee-no", async (req, res) => {
+router.post("/get-employee-no", async (req, res) => {
   let employee = await queryBaseEmp.getNewEmployeeNo();
 
   let employee_no = "";
   if (employee[0].employee_no == null) {
     employee_no = "EMP-00001";
   } else {
- //   console.log(employee);
+    //   console.log(employee);
     employee_no = "EMP-" + employee[0].employee_no.toString().padStart(5, "0");
   }
 
@@ -57,6 +68,7 @@ router.post("/", async (req, res) => {
   let errorMessage = validate(req.body);
   let ifEmployee = await queryBaseEmp.checkPersonIfEmployee(req.body.person_id);
 
+  console.log('IfEmployee: ', ifEmployee)
   if (errorMessage == "") {
     if (ifEmployee.length > 0) {
       errorMessage = "Person Already an Employee";
@@ -72,7 +84,7 @@ router.post("/", async (req, res) => {
         status: 1,
         message: "Successful!",
       });
-  
+
     }
 
   } else {
@@ -87,7 +99,7 @@ router.put("/:id", async (req, res) => {
   let errorMessage = validate(req.body);
 
   req.body.id = +req.params.id;
-
+  console.log(req.body.employee_educations);
   if (errorMessage == "") {
     await queryBaseEmp.update(req.body);
     res.send({

@@ -63,7 +63,7 @@
   </head>
   <script src="empscript.js"></script>
 
-  <body onload="loadPerson()"></body>
+  <body onload="readyForm()"></body>
   <div class="back">
     <div class="div-center">
       <div class="content">
@@ -73,10 +73,10 @@
           <div class="form-group">
             <input name="id" hidden /> <br />
           </div>
-          <div class="form-group">
+          <div class="form-group" hidden>
             <label for="person_id">Person Name</label>
-            <select class="form-select" id="person_id" name="person_id">
-            </select>
+            <input type="hidden" name="person_id"  class="form-control" id="person_id">
+          
           </div>
           
           <div class="form-group">
@@ -117,6 +117,8 @@
                   <th>Education Level</th>
                   <th>School</th>
                   <th>Year Graduated</th>
+                  <th></th>
+                  
                 </tr>
               </thead>
               <tbody></tbody>
