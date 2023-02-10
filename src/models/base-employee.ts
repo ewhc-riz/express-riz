@@ -12,20 +12,37 @@ export let queryBaseEmp: any = {
     let _self = this;
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee `;
-      let query = `SELECT  base_employee.id as employee_id, base_person.*, base_employee.*, 
-                  DATE_FORMAT(base_person.date_of_birth, '%Y-%m-%d') as date_of_birth, 
-                  CONCAT(MIN(educ.year_graduated), '-', MAX(educ.year_graduated)) as educ_years,
-                  GROUP_CONCAT(DISTINCT educ.level) as educ_levels
-       FROM base_person INNER JOIN base_employee ON base_person.id = base_employee.person_id
-       LEFT JOIN base_employee_education  educ on (base_employee.id = educ.employee_id AND educ.is_deleted = 0)
+      let query = `SELECT 
+                    base_employee.*,
+                    base_employee.id as employee_id, 
+                    base_person.first_name,
+                    base_person.last_name,
+                    base_person.date_of_birth,
+                    base_person.gender,
+                    base_person.citizen,   
+                    DATE_FORMAT(base_person.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
+                    COALESCE(_education.educ_years, '--') AS educ_years,
+                    COALESCE(_education.levels, '--') AS educ_levels,
+                  FROM base_employee 
+                  LEFT JOIN base_person 
+                    ON base_person.id = base_employee.person_id
+                  LEFT JOIN (
+                    SELECT
+                      _education.employee.id,
+                      CONCAT(MIN(educ.year_graduated), '-', MAX(educ.year_graduated)) AS educ_years,
+                      GROUP_CONCAT(DISTINCT _education.level) AS educ_levels
+                    FROM base_employee_education _education
+                    WHERE _education.is_delete = 0
+                    GROUP BY _education.employee.id
+                  ) _education
+                  LEFT JOIN base_employee_education  educ on (base_employee.id = educ.employee_id AND educ.is_deleted = 0)
        `;
 
       let whereClause = ` WHERE 1 `;
-      let groupClause = ` GROUP BY base_employee.id `;
       if (data.employeeId > 0) {
         whereClause += ` AND base_employee.id = ${data.employeeId}`
       }
-      db.query(query + whereClause + groupClause, (err, results) => {
+      db.query(query + whereClause, (err, results) => {
         if (err) {
           console.log("Reject error:", err);
           return reject(err);
@@ -45,8 +62,14 @@ export let queryBaseEmp: any = {
   getEmployeeEducation(employeeId: number) {
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee `;
-      let query = `SELECT  id, level, school_name, year_graduated
-                  FROM base_employee_education `;
+      let query = `
+        SELECT  
+          id, 
+          level, 
+          school_name, 
+          year_graduated
+        FROM 
+          base_employee_education `;
 
       let whereClause = ` WHERE 1 AND employee_id=${employeeId} AND is_deleted = 0`;
 
