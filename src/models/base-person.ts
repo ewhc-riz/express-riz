@@ -16,7 +16,7 @@ export let queryBasePerson: any = {
               COALESCE(base_person.gender, "") AS 'gender', base_employee.id as employee_id 
           FROM base_person LEFT JOIN base_employee on (base_person.id = base_employee.person_id) `;
       let whereClause = ` WHERE 1 `;
-      if (data.query_employee_id == 1){
+      if (data.query_employee_id == 1) {
         whereClause += ` AND base_employee.employee_id IS NULL`;
       }
       //   if (data.first_name.t rim().length > 0) {
@@ -115,12 +115,19 @@ export let queryBasePerson: any = {
             last_name,
             date_of_birth,
             gender,
+            citizen,
             date_created
           ) VALUES (
-            ?,?,?,?,
+            ?,?,?,?,?,
             NOW()
           )`,
-        [data.first_name, data.last_name, data.date_of_birth, data.gender],
+        [
+          data.first_name,
+          data.last_name,
+          data.date_of_birth,
+          data.gender,
+          data.citizen,
+        ],
         (err, results) => {
           if (err) {
             console.log("Reject error:", err);
@@ -162,17 +169,13 @@ export let queryBasePerson: any = {
   },
   delete(id) {
     return new Promise((resolve, reject) => {
-      db.query(
-        `DELETE FROM base_person WHERE id=?`,
-        [id],
-        (err, results) => {
-          if (err) {
-            console.log("Reject error:", err);
-            return reject(err);
-          }
-          return resolve(results);
+      db.query(`DELETE FROM base_person WHERE id=?`, [id], (err, results) => {
+        if (err) {
+          console.log("Reject error:", err);
+          return reject(err);
         }
-      );
+        return resolve(results);
+      });
     });
   },
 };

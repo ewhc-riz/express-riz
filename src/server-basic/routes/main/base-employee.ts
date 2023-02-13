@@ -1,6 +1,8 @@
 import express from "express";
 const router = express.Router();
 import { queryBaseEmp } from "../../../models/base-employee";
+import { queryBasePerson } from "../../../models/base-person";
+import moment from "moment";
 
 function validate(data) {
   let errorMessage = "";
@@ -8,12 +10,10 @@ function validate(data) {
   if (data.last_name == "") {
     // errorMessage = "Person is required";
     errorMessage += "Lastname is required <br>";
-
   }
   if (data.first_name == "") {
     // errorMessage = "Person is required";
     errorMessage += "Firstname is required <br>";
-
   }
   if (data.gender == "") {
     // errorMessage = "Person is required";
@@ -24,7 +24,6 @@ function validate(data) {
     errorMessage += "Birthday is required <br>";
   }
 
-
   return errorMessage;
 }
 
@@ -33,20 +32,19 @@ router.get("/", async (req, res) => {
   res.send(await queryBaseEmp.getAll(req.query));
 });
 
-
 router.get("/:id", async (req, res) => {
   let data = {
-    employeeId: req.params.id
+    employeeId: req.params.id,
   };
   let employeeInfo = await queryBaseEmp.getAll(data);
-  
-  let employeeEducation = await queryBaseEmp.getEmployeeEducation(req.params.id);
-  
-  
 
-  res.send( {
-    employee : employeeInfo,
-    education : employeeEducation
+  let employeeEducation = await queryBaseEmp.getEmployeeEducation(
+    req.params.id
+  );
+
+  res.send({
+    employee: employeeInfo,
+    education: employeeEducation,
   });
 });
 
@@ -68,7 +66,7 @@ router.post("/", async (req, res) => {
   let errorMessage = validate(req.body);
   let ifEmployee = await queryBaseEmp.checkPersonIfEmployee(req.body.person_id);
 
-  console.log('IfEmployee: ', ifEmployee)
+  console.log("IfEmployee: ", ifEmployee);
   if (errorMessage == "") {
     if (ifEmployee.length > 0) {
       errorMessage = "Person Already an Employee";
@@ -76,17 +74,27 @@ router.post("/", async (req, res) => {
         status: 0,
         message: errorMessage,
       });
-    }
-    else {
+    } else {
       console.log(req.body);
-      await queryBaseEmp.insert(req.body);
+      //must have insert person
+      req.body.citizen = req.body.citizen == "on" ? 1 : 0;
+      req.body.date_of_birth = moment(req.body.date_of_birth).format('YYYY-MM-DD');
+      let result0 = await queryBasePerson.insert(req.body);
+      req.body.person_id = result0.insertId;
+
+      let result = await queryBaseEmp.insert(req.body);
+      
+      for (let educ of req.body.employee_educations) {
+        if (+educ.for_deletion == 0) {
+          educ.employee_id = result.insertId;
+          queryBaseEmp.insertEducation(educ);
+        }
+      }
       res.send({
         status: 1,
         message: "Successful!",
       });
-
     }
-
   } else {
     res.send({
       status: 0,
@@ -101,6 +109,12 @@ router.put("/:id", async (req, res) => {
   req.body.id = +req.params.id;
   console.log(req.body.employee_educations);
   if (errorMessage == "") {
+  // update person
+    req.body.citizen = req.body.citizen == "on" ? 1 : 0;
+    req.body.date_of_birth = moment(req.body.date_of_birth).format('YYYY-MM-DD');
+    let result0 = await queryBasePerson.update(req.body);
+    req.body.person_id = result0.insertId;
+
     await queryBaseEmp.update(req.body);
     res.send({
       status: 1,
