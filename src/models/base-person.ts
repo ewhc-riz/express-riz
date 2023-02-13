@@ -140,13 +140,15 @@ export let queryBasePerson: any = {
   },
   update(data) {
     return new Promise((resolve, reject) => {
+    console.log('Employee Data Before Update:', data);
       db.query(
         `UPDATE base_person 
           SET
             first_name=?, 
             last_name=?,
             date_of_birth=?,
-            gender=?
+            gender=?,
+            citizen=?
           WHERE
             id=?
           `,
@@ -155,7 +157,8 @@ export let queryBasePerson: any = {
           data.last_name,
           data.date_of_birth,
           data.gender,
-          data.id,
+          data.citizen,
+          data.person_id,
         ],
         (err, results) => {
           if (err) {

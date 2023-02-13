@@ -24,6 +24,14 @@ function validate(data) {
     errorMessage += "Birthday is required <br>";
   }
 
+  if(data.date_hired == '') {
+    errorMessage += "Date Hired is required <br>";
+  } 
+
+  if(!moment(data.date_hired).isValid()) {
+    errorMessage += "Date Hired is invalid <br>";
+  } 
+
   return errorMessage;
 }
 
@@ -107,15 +115,33 @@ router.put("/:id", async (req, res) => {
   let errorMessage = validate(req.body);
 
   req.body.id = +req.params.id;
-  console.log(req.body.employee_educations);
+  console.log('Employee Data: ', req.body);
   if (errorMessage == "") {
-  // update person
+    /* START UPDATE EMPLOYEE INFO - base_person*/ 
     req.body.citizen = req.body.citizen == "on" ? 1 : 0;
     req.body.date_of_birth = moment(req.body.date_of_birth).format('YYYY-MM-DD');
-    let result0 = await queryBasePerson.update(req.body);
-    req.body.person_id = result0.insertId;
+    
+    await queryBasePerson.update(req.body);
+    /* END UPDATE EMPLOYEE INFO - base_person*/   
 
+
+    /*START Update employee Info base_employee */
+    req.body.date_hired = moment(req.body.date_hired).format('YYYY-MM-DD');
     await queryBaseEmp.update(req.body);
+    /*END update employee info base_employee */
+
+
+    /* START UPDATE / INSERT EMPLOYEE EDUCATION */
+    for(let educ of req.body.employee_educations) {
+      if (educ.id == 0) {
+        await queryBaseEmp.insertEducation(educ);
+      }      
+      else {
+        await queryBaseEmp.updateEducation(educ);
+      }
+    }
+    /* END UPDATE / INSERT EMPLOYEE EDUCATION */
+
     res.send({
       status: 1,
       message: "Successful!",

@@ -42,8 +42,7 @@ function loadEmployee() {
                   <td>${emp.first_name}</td>
                   <td>${emp.educ_years}</td>
                   <td>${emp.educ_levels}</td>
-                  
-                  
+                 
                   <td><button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">Delete</button></td>
               </tr>`;
           $("#table1 > tbody").append(rowHtml);
@@ -104,6 +103,7 @@ function readyForm() {
           for (let key of Object.keys(registrationFormValue)) {
             $("[name=" + key + "]").val(employee[key]);
           }
+          $("#citizen").prop('checked', +employee.citizen == 1? true : false);
           let education = data.education.list;
           for (index = 0; index < education.length; index ++) {
             html = `

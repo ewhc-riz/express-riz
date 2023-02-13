@@ -12,19 +12,21 @@ export let queryBaseEmp: any = {
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee `;
       let query = `SELECT 
-                    base_employee.*,
-                    base_employee.id as employee_id, 
-                    base_person.first_name,
-                    base_person.last_name,
-                    base_person.date_of_birth,
-                    base_person.gender,
-                    base_person.citizen,   
-                    DATE_FORMAT(base_person.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
+                    emp.id as employee_id, 
+                    emp.id as id,
+                    emp.employee_no,
+                    DATE_FORMAT(emp.date_hired, '%Y-%m-%d') AS date_hired, 
+                    person.id as person_id,
+                    person.first_name,
+                    person.last_name,
+                    person.gender,
+                    person.citizen,   
+                    DATE_FORMAT(person.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
                     COALESCE(_education.years, '--') AS educ_years,
                     COALESCE(_education.levels, '--') AS educ_levels
-                  FROM base_employee 
-                  LEFT JOIN base_person 
-                    ON base_person.id = base_employee.person_id
+                  FROM base_employee emp
+                  LEFT JOIN base_person person
+                       ON (person.id = emp.person_id)
                   LEFT JOIN (
                     SELECT
                       _education.employee_id,
@@ -34,12 +36,12 @@ export let queryBaseEmp: any = {
                     WHERE _education.is_deleted = 0
                     GROUP BY _education.employee_id
                   ) _education 
-                  ON _education.employee_id = base_employee.id
+                  ON _education.employee_id = emp.id
        `;
 
       let whereClause = ` WHERE 1 `;
       if (data.employeeId > 0) {
-        whereClause += ` AND base_employee.id = ${data.employeeId}`;
+        whereClause += ` AND emp.id = ${data.employeeId}`;
       }
       db.query(query + whereClause, (err, results) => {
         if (err) {
@@ -108,8 +110,8 @@ export let queryBaseEmp: any = {
   insert(data) {
     // console.log("??data: ", data);
     return new Promise((resolve, reject) => {
-        db.query(
-          `INSERT INTO base_employee 
+      db.query(
+        `INSERT INTO base_employee 
             (
               person_id,
               employee_no,
@@ -118,92 +120,35 @@ export let queryBaseEmp: any = {
               ?,?,
               NOW()
             )`,
-          [data.person_id, 
-          data.employee_no],
-          (err, result) => {
-            if (err) {
-              console.log("Insert Employee Error: ", err);
-              return reject(err);
-            }
-            resolve(result);
+        [data.person_id,
+        data.employee_no],
+        (err, result) => {
+          if (err) {
+            console.log("Insert Employee Error: ", err);
+            return reject(err);
           }
-        );
+          resolve(result);
+        }
+      );
     });
   },
 
   update(data) {
     return new Promise((resolve, reject) => {
-      db.query(
-        `UPDATE base_person 
-                 SET first_name=?, last_name=?, date_of_birth=?, gender=?, citizen=?
-                 WHERE id = ?`,
-        [
-          data.first_name,
-          data.last_name,
-          moment(data.date_of_birth).format("YYYY-MM-DD"),
-          data.gender,
-          data.citizen == "on" ? 1 : 0,
-          data.person_id,
-        ],
-        (err, result) => {
-          if (err) {
-            console.log("Update Person Info Error: ", err.message);
-            reject(err);
-          }
-          return resolve(result);
-        }
-      );
-      for (let educ of data.employee_educations) {
-        if (educ.id > 0) {
-          if (educ.for_deletion == 0) {
-            db.query(
-              `UPDATE base_employee_education 
-                SET level = ?, school_name = ?, year_graduated = ? 
-                WHERE id = ?`,
-              [educ.level, educ.school_name, educ.year_graduated, educ.id],
-              (err, result) => {
-                if (err) {
-                  console.log("Update Education Error : ", err.message);
-                }
-                return resolve(result);
-              }
-            );
-          } else {
-            db.query(
-              `UPDATE base_employee_education SET is_deleted = 1 WHERE id=?`,
-              [educ.id],
-              (err, result) => {
-                if (err) {
-                  console.log("Education Deletion Error: ", err.message);
-                  return reject(err);
-                } else {
-                  return resolve(result);
-                }
-              }
-            );
-          }
-        } else {
-          if (educ.for_deletion == 0) {
-            db.query(
-              `INSERT INTO base_employee_education (employee_id, level, school_name, year_graduated) 
-              VALUES(?, ?, ?, ?) `,
-              [data.id, educ.level, educ.school_name, educ.year_graduated],
-              (err, result) => {
-                if (err) {
-                  console.log("Insert New Education Error : ", err.message);
-                }
-                return resolve(result);
-              }
-            );
-          }
-        }
-      }
-      return resolve({
-        status: 1,
-        message: "Successfully updated Employee Info.",
-      });
-    });
-  },
+        db.query(`UPDATE base_employee 
+                  SET date_hired = ?
+                  WHERE id = ?`, 
+                  [data.date_hired, data.id],
+                  (err, result) => {
+                    if(err) {
+                      console.log('Update Employee Info Error:', err.message);
+                      return reject(err);
+                    }
+                    return resolve(result);
+                  });
+    })
+  }
+  ,
   delete(id) {
     return new Promise((resolve, reject) => {
       db.query(`DELETE FROM base_employee WHERE id=?`, [id], (err, results) => {
@@ -274,4 +219,24 @@ export let queryBaseEmp: any = {
       );
     });
   },
+
+  updateEducation(data: any) {
+    return new Promise((resolve, reject) => {
+      db.query(
+        `UPDATE base_employee_education 
+          SET level = ?, school_name = ?, year_graduated = ?, is_deleted = ? 
+          WHERE id = ?`,
+        [data.level, data.school_name, data.year_graduated, data.for_deletion, data.id],
+        (err, result) => {
+          if (err) {
+            console.log("Update Education Error : ", err.message);
+            reject(err);
+          }
+          return resolve(result);
+        }
+      );
+
+    });
+
+  }
 };
