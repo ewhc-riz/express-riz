@@ -1,7 +1,7 @@
 import { db } from "./_database";
 import moment from "moment";
 
-export let queryBaseEmpEd: any = {
+export let queryBaseEmployeeEducation: any = {
   getStatusProperty(row) {
     return {
       status_label: "DEFAULT",
@@ -11,50 +11,22 @@ export let queryBaseEmpEd: any = {
     let _self = this;
     return new Promise((resolve, reject) => {
       let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee_education `;
-      let query = `SELECT 
-                        base_employee_education.*, base_employee.*, base_person.*, base_employee_education.id as base_employee_education_id
-                        FROM base_employee_education 
-                        INNER JOIN base_employee ON (base_employee.id = base_employee_education.employee_id)
-                        INNER JOIN base_person ON (base_person.id = base_employee.person_id)
+      let query = `
+        SELECT 
+          base_employee_education.*, 
+          base_employee.employee_no, 
+          base_employee.date_hired, 
+          base_person.first_name, 
+          base_person.last_name, 
+          base_person.date_of_birth, 
+          base_employee_education.id AS 'base_employee_education_id'
+        FROM base_employee_education 
+        INNER JOIN base_employee 
+          ON (base_employee.id = base_employee_education.employee_id)
+        INNER JOIN base_person 
+          ON (base_person.id = base_employee.person_id)
                         `;
       let whereClause = ` WHERE 1 `;
-      //   if (data.first_name.trim().length > 0) {
-      //     let qAll = db.escape(
-      //       "%" + data.first_name.toLowerCase().trim() + "%"
-      //     );
-      //     whereClause += ` AND base_employee_education.first_name LIKE ${qAll} `;
-      //   }
-      //   if (data.last_name.trim().length > 0) {
-      //     let qAll = db.escape(
-      //       "%" + data.last_name.toLowerCase().trim() + "%"
-      //     );
-      //     whereClause += ` AND base_employee_education.last_name LIKE ${qAll} `;
-      //   }
-      //   if (data.date_of_birth.trim().length > 0) {
-      //     let qAll = db.escape(
-      //       "%" + data.date_of_birth.toLowerCase().trim() + "%"
-      //     );
-      //     whereClause += ` AND base_employee_education.date_of_birth LIKE ${qAll} `;
-      //   }
-      //   if (data.selectionGender.trim().length > 0) {
-      //     let qAll = db.escape(
-      //       "%" + data.selectionGender.toLowerCase().trim() + "%"
-      //     );
-      //     whereClause += ` AND base_employee_education.selectionGender LIKE ${qAll} `;
-      //   }
-      //   if (data.citizen.trim().length > 0) {
-      //     let qAll = db.escape(
-      //       "%" + data.citizen.toLowerCase().trim() + "%"
-      //     );
-      //     whereClause += ` AND base_employee_education.citizen LIKE ${qAll} `;
-      //   }
-      // if (data.status) {
-      //   whereClause += ` AND base_employee_education.status = '${data.status}' `;
-      // }
-      // if (data.name) {
-      //   let qAll = db.escape("%" + data.name.trim() + "%");
-      //   whereClause += ` AND base_employee_education.name LIKE ${qAll} `;
-      // }
       //<< count query >>
       db.query(queryCount + whereClause, (err0, result) => {
         if (data.direction) {
@@ -68,12 +40,6 @@ export let queryBaseEmpEd: any = {
             console.log("Reject error:", err);
             return reject(err);
           }
-          // results.map(function (row, index) {
-          //   // row["statusProperty"] = _self.getStatusProperty(row);
-          //   row["date_of_birth"] = moment(row.date_of_birth).format(
-          //     "YYYY-MM-DD"
-          //   );
-          // });
           return resolve({
             list: results,
             totalCount: result && result[0] ? result[0].totalCount : 0,
@@ -84,7 +50,7 @@ export let queryBaseEmpEd: any = {
   },
   getEducation(id) {
     let _self = this;
-   
+
     return new Promise((resolve, reject) => {
       db.query(
         `SELECT base_employee_education.* FROM base_employee_education WHERE base_employee_education.id=?`,
@@ -95,7 +61,7 @@ export let queryBaseEmpEd: any = {
             return reject(err);
           }
           //console.log(results);
-           return resolve(results[0]);
+          return resolve(results[0]);
         }
       );
     });

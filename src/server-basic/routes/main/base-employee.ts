@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { queryBaseEmp } from "../../../models/base-employee";
+import { queryBaseEmployee } from "../../../models/base-employee";
 import { queryBasePerson } from "../../../models/base-person";
 import moment from "moment";
 
@@ -25,16 +25,16 @@ function validate(data) {
 }
 
 router.get("/", async (req, res) => {
-  res.send(await queryBaseEmp.getAll(req.query));
+  res.send(await queryBaseEmployee.getAll(req.query));
 });
 
 router.get("/:id", async (req, res) => {
-  let employee = await queryBaseEmp.get(+req.params.id);
+  let employee = await queryBaseEmployee.get(+req.params.id);
   res.send(employee);
 });
 
 router.post("/get-employee-no", async (req, res) => {
-  let employee = await queryBaseEmp.getNewEmployeeNo();
+  let employee = await queryBaseEmployee.getNewEmployeeNo();
 
   let employee_no = "";
   if (employee[0].employee_no == null) {
@@ -62,12 +62,12 @@ router.post("/", async (req, res) => {
     req.body.person_id = result0.insertId;
 
     // insert employee
-    let result = await queryBaseEmp.insert(req.body);
+    let result = await queryBaseEmployee.insert(req.body);
 
     for (let educ of req.body.employee_educations) {
       if (+educ.for_deletion == 0) {
         educ.employee_id = result.insertId;
-        queryBaseEmp.insertEducation(educ);
+        queryBaseEmployee.insertEducation(educ);
       }
     }
     res.send({
@@ -99,16 +99,16 @@ router.put("/:id", async (req, res) => {
 
     /*START Update employee Info base_employee */
     req.body.date_hired = moment(req.body.date_hired).format("YYYY-MM-DD");
-    await queryBaseEmp.update(req.body);
+    await queryBaseEmployee.update(req.body);
     /*END update employee info base_employee */
 
     /* START UPDATE / INSERT EMPLOYEE EDUCATION */
     for (let educ of req.body.employee_educations) {
       if (educ.id == 0) {
         educ.employee_id = +req.params.id;
-        await queryBaseEmp.insertEducation(educ);
+        await queryBaseEmployee.insertEducation(educ);
       } else {
-        await queryBaseEmp.updateEducation(educ);
+        await queryBaseEmployee.updateEducation(educ);
       }
     }
     /* END UPDATE / INSERT EMPLOYEE EDUCATION */
@@ -126,7 +126,7 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/delete-employee/:id", async (req, res) => {
-  await queryBaseEmp.delete(+req.params.id);
+  await queryBaseEmployee.delete(+req.params.id);
   res.send({
     status: 1,
     message: "Successful!",

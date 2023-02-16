@@ -1,7 +1,7 @@
 import { db } from "./_database";
 import moment from "moment";
 
-export let queryBaseEmp: any = {
+export let queryBaseEmployee: any = {
   getStatusProperty(row) {
     return {
       status_label: "DEFAULT",

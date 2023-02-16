@@ -1,10 +1,10 @@
 import express from "express";
 const router = express.Router();
 // const dataqueryBaseEmpEd = require("./model.js");
-import { queryBaseEmpEd } from "../../../models/base-emped";
+import { queryBaseEmployeeEducation } from "../../../models/base-emped";
 
 async function validate(data) {
-  let ifEducationExists = await queryBaseEmpEd.checkEducationIfExists(data.employee_id, data.level);
+  let ifEducationExists = await queryBaseEmployeeEducation.checkEducationIfExists(data.employee_id, data.level);
   let errorMessage = "";
  
 return new Promise((resolve, reject) => {
@@ -32,18 +32,18 @@ return new Promise((resolve, reject) => {
 }
 
 router.get("/", async (req, res) => {
-  res.send(await queryBaseEmpEd.getAll(req.query));
+  res.send(await queryBaseEmployeeEducation.getAll(req.query));
 });
 
 router.get("/person-employee", async (req, res) => {
 
-  res.send(await queryBaseEmpEd.getAll(req.query));
+  res.send(await queryBaseEmployeeEducation.getAll(req.query));
 });
 
 router.get("/get-education/:id", async (req, res) => {
 
   console.log('Params Id: ', req.params.id);
-  let employeeEducation = await queryBaseEmpEd.getEducation(+req.params.id);
+  let employeeEducation = await queryBaseEmployeeEducation.getEducation(+req.params.id);
   //console.log(employeeEducation);
   res.send(employeeEducation);
 });
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
   let errorMessage = await validate(req.body);
   console.log(req.body);
   if (errorMessage == "") {
-    await queryBaseEmpEd.insert(req.body);
+    await queryBaseEmployeeEducation.insert(req.body);
     res.send({
       status: 1,
       message: "Successful!",
@@ -71,7 +71,7 @@ router.put("/:id", async (req, res) => {
   req.body.id = +req.params.id;
 
   if (errorMessage == "") {
-    await queryBaseEmpEd.update(req.body);
+    await queryBaseEmployeeEducation.update(req.body);
     res.send({
       status: 1,
       message: "Successful!",
@@ -85,7 +85,7 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/delete/:id", async (req, res) => {
-  await queryBaseEmpEd.delete(+req.params.id);
+  await queryBaseEmployeeEducation.delete(+req.params.id);
   console.log('Delete: ', req.params.id)
   res.send({
     status: 1,
