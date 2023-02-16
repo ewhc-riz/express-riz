@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 // const dataqueryBaseEmpEd = require("./model.js");
-import { queryBaseEmployeeEducation } from "../../../models/base-emped";
+import { queryBaseEmployeeEducation } from "../../../models/base-employee-education";
 
 async function validate(data) {
   let ifEducationExists = await queryBaseEmployeeEducation.checkEducationIfExists(data.employee_id, data.level);

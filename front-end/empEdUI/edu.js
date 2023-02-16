@@ -33,7 +33,7 @@ function loadEmployeeEd() {
         for (let edu of data.list) {
           // console.log(emp);
           let rowHtml = `<tr>
-                    <td><a href="edu-form.html?id=${edu.base_employee_education_id}">${edu.base_employee_education_id}</a></td>
+                    <td><a href="education-form.html?id=${edu.base_employee_education_id}">${edu.base_employee_education_id}</a></td>
                     <td>${edu.employee_id}</td>
                     <td>${edu.last_name}, ${edu.first_name}</td>
                     <td>${edu.level}</td>
@@ -111,7 +111,7 @@ function save() {
       console.log(data);
       if (data.status == 1) {
         console.log();
-        goto("../empEdUI/edu.html");
+        goto("../empEdUI/education-list.html");
       } else {
 
         $("#status_message1").html(data.message);
