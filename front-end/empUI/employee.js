@@ -33,7 +33,7 @@ function loadEmployee() {
         for (let emp of data.list) {
           // console.log(emp);
           let rowHtml = `<tr>
-                  <td><a href="emp-form.html?id=${emp.id}">${emp.id}</a></td>
+                  <td><a href="employee-form.html?id=${emp.id}">${emp.id}</a></td>
                   <td>${emp.person_id}</td>
                   <td>${emp.employee_no}</td>
                   <td>${emp.last_name}</td>
@@ -201,7 +201,7 @@ function save() {
       console.log(data);
       if (data.status == 1) {
         console.log();
-        goto("../empUI/emp.html");
+        goto("../empUI/employee-list.html");
       } else {
         $("#status_message1").html(data.message);
         setTimeout(function () {
