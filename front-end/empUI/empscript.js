@@ -14,13 +14,11 @@ $.fn.serializeObject = function () {
   return o;
 };
 
-
 const BACKEND_URL = "http://127.0.0.1:3000/api/main";
 
 $(document).ready(function () {
   console.log("ready");
 });
-
 
 function loadEmployee() {
   $.ajax(
@@ -69,10 +67,10 @@ function loadPerson() {
         $("#person_id").append(
           $(
             "<option value='" +
-            value.id +
-            "'>" +
-            (value.last_name + ", " + value.first_name) +
-            "</option>"
+              value.id +
+              "'>" +
+              (value.last_name + ", " + value.first_name) +
+              "</option>"
           )
         );
       });
@@ -97,17 +95,16 @@ function readyForm() {
       // type: "GET",
       success: function (data, status, xhr) {
         console.log(data);
-        let employee = data.employee.list[0];
-        if (employee) {
+        if (data) {
           let registrationFormValue = $("#registrationForm").serializeObject();
           for (let key of Object.keys(registrationFormValue)) {
-            $("[name=" + key + "]").val(employee[key]);
+            $("[name=" + key + "]").val(data[key]);
           }
-          $("#citizen").prop('checked', +employee.citizen == 1? true : false);
-          let education = data.education.list;
-          for (index = 0; index < education.length; index ++) {
+          $("#citizen").prop("checked", +data.citizen == 1 ? true : false);
+          let educations = data.educations;
+          for (index = 0; index < educations.length; index++) {
             html = `
-            <tr id="educ_row_${education[index].id}">
+            <tr id="educ_row_${educations[index].id}">
              <td>
                <select class="form-select" id="level_${index}" value>
                  <option value="">Please Select</option>
@@ -123,25 +120,24 @@ function readyForm() {
              <td><input class="form-control" type="number" id="year_graduated_${index}" min="1900" max="2023" /></td>
              <td><input class="form-control" type="hidden" id="employee_education_id_${index}"/></td>
              <td><input class="form-control" type="hidden" id="educ_for_deletion_${index}"/></td>
-             <td><button class="btn btn-primary" onclick="deleteEducRow('existing', ${education[index].id}, ${index})">Delete</button></td>
+             <td><button class="btn btn-primary" onclick="deleteEducRow('existing', ${educations[index].id}, ${index})">Delete</button></td>
              
             </tr>
            `;
             $("#employee_education tbody").append(html);
-            $(`#level_${index}`).val(education[index].level);
-            $(`#school_name_${index}`).val(education[index].school_name);
-            $(`#year_graduated_${index}`).val(education[index].year_graduated);
-            $(`#employee_education_id_${index}`).val(education[index].id);
+            $(`#level_${index}`).val(educations[index].level);
+            $(`#school_name_${index}`).val(educations[index].school_name);
+            $(`#year_graduated_${index}`).val(educations[index].year_graduated);
+            $(`#employee_education_id_${index}`).val(educations[index].id);
             $(`#educ_for_deletion_${index}`).val(0);
-            
-            console.log(education[index]);
-            console.log(index);
-           }
+
+            // console.log(educations[index]);
+            // console.log(index);
+          }
         }
       },
     });
-  }
-  else{
+  } else {
     $.ajax(BACKEND_URL + "/base-employees/get-employee-no", {
       type: "POST",
       success: function (data) {
@@ -151,28 +147,22 @@ function readyForm() {
     });
   }
 }
-function deleteEducRow(status, rowId, index)
-{
-  if(confirm('Confirm Delete of Educ Row?') ) {
-    if (status == 'existing') {
+function deleteEducRow(status, rowId, index) {
+  if (confirm("Confirm Delete of Educ Row?")) {
+    if (status == "existing") {
       $(`#educ_row_${rowId}`).css({
-        'text-decoration': 'line-through'
+        "text-decoration": "line-through",
       });
 
-      $(`#educ_for_deletion_${index}`).val('1');
-
-    }
-
-    else {
+      $(`#educ_for_deletion_${index}`).val("1");
+    } else {
       $(`#educ_new_row_${index}`).css({
-        'text-decoration': 'line-through'
+        "text-decoration": "line-through",
       });
       $(`#educ_for_deletion_${index}`).val(1);
-
     }
 
     //$(`#${rowId}`).remove();
-
   }
 }
 
@@ -190,11 +180,11 @@ function save() {
     var educ_id = $("#employee_education_id_" + index).val();
     var for_deletion = $(`#educ_for_deletion_` + index).val();
     employeeEducations.push({
-      id : educ_id,
+      id: educ_id,
       level: level,
       school_name: school_name,
       year_graduated: year_graduated,
-      for_deletion : for_deletion
+      for_deletion: for_deletion,
     });
   });
 
@@ -220,10 +210,7 @@ function save() {
       }
     },
   });
-
-
 }
-
 
 function deleteEmployee(id) {
   var confirmation = confirm("Are you sure you want to delete ?");
@@ -273,5 +260,4 @@ function addEducation() {
       </tr>
   `;
   $("#employee_education tbody").append(html);
-  
 }
