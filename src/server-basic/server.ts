@@ -2,9 +2,12 @@
 import express from "express";
 import cors from "cors";
 var fs = require("fs");
+import env from "dotenv";
+
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
 // app.use(express.json({ limit: "50mb" }));
 app.use(
   express.urlencoded({
