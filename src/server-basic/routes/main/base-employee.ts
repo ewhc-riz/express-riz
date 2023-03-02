@@ -64,12 +64,18 @@ router.post("/", async (req, res) => {
     // insert employee
     let result = await queryBaseEmployee.insert(req.body);
 
-    for (let educ of req.body.employee_educations) {
-      if (+educ.for_deletion == 0) {
-        educ.employee_id = result.insertId;
-        queryBaseEmployee.insertEducation(educ);
+    if (req.body.employee_educations) {
+      for (let educ of req.body.employee_educations) {
+        if (+educ.for_deletion == 0) {
+          educ.employee_id = result.insertId;
+          queryBaseEmployee.insertEducation(educ);
+        }
       }
     }
+
+    // computes education summary
+    // await queryBaseEmployee.PROC_CALC_EMPLOYEE_EDUCATION_SUMMARY();
+
     res.send({
       status: 1,
       message: "Successful!",
@@ -103,15 +109,21 @@ router.put("/:id", async (req, res) => {
     /*END update employee info base_employee */
 
     /* START UPDATE / INSERT EMPLOYEE EDUCATION */
-    for (let educ of req.body.employee_educations) {
-      if (educ.id == 0) {
-        educ.employee_id = +req.params.id;
-        await queryBaseEmployee.insertEducation(educ);
-      } else {
-        await queryBaseEmployee.updateEducation(educ);
+    if (req.body.employee_educations) {
+      for (let educ of req.body.employee_educations) {
+        if (educ.id == 0) {
+          educ.employee_id = +req.params.id;
+          await queryBaseEmployee.insertEducation(educ);
+        } else {
+          await queryBaseEmployee.updateEducation(educ);
+        }
       }
     }
+
     /* END UPDATE / INSERT EMPLOYEE EDUCATION */
+
+    // computes education summary
+    //  await queryBaseEmployee.PROC_CALC_EMPLOYEE_EDUCATION_SUMMARY();
 
     res.send({
       status: 1,

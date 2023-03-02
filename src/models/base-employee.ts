@@ -11,24 +11,13 @@ export let queryBaseEmployee: any = {
   getAll(data) {
     let _self = this;
     return new Promise((resolve, reject) => {
-      let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM base_employee `;
+      let queryCount = `SELECT COUNT(1) AS 'totalCount' FROM vemployee `;
       let query = `
         SELECT 
-          base_employee.id as employee_id, 
-          base_employee.id as id,
-          base_employee.employee_no,
-          DATE_FORMAT(base_employee.date_hired, '%Y-%m-%d') AS date_hired, 
-          person.id as person_id,
-          person.first_name,
-          person.last_name,
-          person.gender,
-          person.citizen,   
-          DATE_FORMAT(person.date_of_birth, '%Y-%m-%d') AS date_of_birth, 
+          vemployee.*,
           COALESCE(_education.years, '--') AS educ_years,
           COALESCE(_education.levels, '--') AS educ_levels
-        FROM base_employee
-        LEFT JOIN base_person person
-              ON person.id = base_employee.person_id
+        FROM view_base_employee AS vemployee
         LEFT JOIN (
           SELECT
             _education.employee_id,
@@ -38,13 +27,13 @@ export let queryBaseEmployee: any = {
           WHERE _education.is_deleted = 0
           GROUP BY _education.employee_id
         ) _education 
-        ON _education.employee_id = base_employee.id
+        ON _education.employee_id = vemployee.id
        `;
 
       let whereClause = ` WHERE 1 `;
 
       if (data.employee_id > 0) {
-        whereClause += ` AND base_employee.id = ${data.employee_id}`;
+        whereClause += ` AND vemployee.id = ${data.employee_id}`;
       }
 
       db.query(query + whereClause, (err, results) => {
@@ -259,6 +248,18 @@ export let queryBaseEmployee: any = {
           return resolve(result);
         }
       );
+    });
+  },
+
+  PROC_CALC_EMPLOYEE_EDUCATION_SUMMARY(data: any) {
+    return new Promise((resolve, reject) => {
+      db.query(`CALL PROC_CALC_EMPLOYEE_EDUCATION_SUMMARY()`, (err, result) => {
+        if (err) {
+          console.log("Call Error : ", err.message);
+          reject(err);
+        }
+        return resolve(result);
+      });
     });
   },
 };
